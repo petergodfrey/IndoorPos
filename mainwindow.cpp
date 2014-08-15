@@ -19,7 +19,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_startButton_clicked() {
     if (l->stop == true) { // Only proceed if thread has been stopped
-        l->stop = false;
+        l->stop   = false;
         l->xStart = ui->xStartLineEdit->text().toInt();
         l->xEnd   = ui->xEndLineEdit->text().toInt();
         l->yStart = ui->yStartLineEdit->text().toInt();

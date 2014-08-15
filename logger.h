@@ -2,8 +2,7 @@
 #define LOGGER_H
 
 #include <QThread>
-#include "sample.h"
-#include "reader.h"
+#include <QTcpSocket>
 
 class Logger : public QThread {
 
@@ -11,22 +10,17 @@ class Logger : public QThread {
 
 public:
     explicit Logger(QObject *parent = 0);
-    //void begin(int xStart, int yStart, int xEnd, int yEnd);
     void run();
     bool stop;
-    int                   xStart;
-    int                   yStart;
-    int                   xEnd;
-    int                   yEnd;
+    int  xStart;
+    int  yStart;
+    int  xEnd;
+    int  yEnd;
 
 private:
-    Reader                r;
-    std::vector<Sample *> samples;
-    time_t                startTime;
-    time_t                endTime;
+    QTcpSocket *socket;
 
 signals:
-
 
 public slots:
 

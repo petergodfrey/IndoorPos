@@ -1,36 +1,27 @@
 #include "sample.h"
 
+#include <QDebug>
+
 #include <cmath>
-#include <sstream>
-#include <iostream>
+#include <QStringList>
 
 #define PI 3.14159
 
-Sample::Sample(std::string line) {
-    std::vector<std::string> items;
-    split(line, ',', items);
-    time                = items[0];
-    timestamp           = items[1];
-    recordTime          = items[2];
-    double ax           = std::stod(items[3]);
-    double ay           = std::stod(items[4]);
-    double az           = std::stod(items[5]);
-    double bx           = std::stod(items[6]);
-    double by           = std::stod(items[7]);
-    double bz           = std::stod(items[8]);
+Sample::Sample(QString line) {
+    QStringList items   = line.split(",");
+    time                = items.at(0);
+    timestamp           = items.at(1);
+    recordTime          = items.at(2);
+    double ax           = items.at(3).toDouble();
+    double ay           = items.at(4).toDouble();
+    double az           = items.at(5).toDouble();
+    double bx           = items.at(6).toDouble();
+    double by           = items.at(7).toDouble();
+    double bz           = items.at(8).toDouble();
     double aIntensity   = (ax * ax) + (ay * ay) + (az * az);
     double bIntensity   = (bx * bx) + (by * by) + (bz * bz);
     double theta        = (PI / 2) - acos(aIntensity /
                           ( sqrt(aIntensity) * sqrt(bIntensity) ) );
     horizontalIntensity = bIntensity * cos(theta);
     verticalIntensity   = bIntensity * sin(theta);
-}
-
-std::vector<std::string> &Sample::split(const std::string &s, char delim, std::vector<std::string> &items) {
-    std::stringstream ss(s);
-    std::string item;
-    while ( std::getline(ss, item, delim) ) {
-        items.push_back(item);
-    }
-    return items;
 }

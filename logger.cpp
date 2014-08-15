@@ -1,44 +1,61 @@
 #include "logger.h"
 
+#include <QDebug>
+
+#include "sample.h"
+#include <QList>
 #include <cmath>
-#include <QtCore>
-#include <iostream>
+
+#define MIN_LINE_LENGTH 106
 
 Logger::Logger(QObject *parent) :
-    QThread   (parent),
-    stop      (true),
-    r         ("192.168.0.10", 51600),
-    xStart    (0),
-    yStart    (0),
-    xEnd      (0),
-    yEnd      (0),
-    startTime (0),
-    endTime   (0) {
+    QThread (parent),
+    stop    (true),
+    xStart  (0),
+    yStart  (0),
+    xEnd    (0),
+    yEnd    (0) {
+    socket = new QTcpSocket(this);
+    socket->connectToHost("192.168.0.10", 51600);
+    if ( socket->waitForConnected(1000) ) {
+        qDebug() << "Connected";
+    } else {
+        qDebug() << "Connection Failed";
+    }
 }
 
 void Logger::run() {
-    // Read samples
-    startTime = time(0);
+    QList<Sample *> samples;
+    socket->readAll(); // Flush
     while (true) {
         QMutex mutex;
         mutex.lock();
         if (this->stop) break;
         mutex.unlock();
-        samples.push_back( new Sample( r.readLine() ) );
+        QString line;
+        do {
+            while ( !socket->canReadLine() ) {
+                socket->waitForReadyRead(100);
+            }
+            line = socket->readLine();
+        } while( !line[0].isDigit() );
+        qDebug() << line;
+        samples.append( new Sample(line) );
     }
-    endTime = time(0);
-
     // Euclidian distance between start & end coordinates
-    double distance          = sqrt( ((xStart - xEnd) * (xStart - xEnd)) +
-                                     ((yStart - yEnd) * (yStart - yEnd)) );
-    // The distance travelled between each sample
-    double distancePerSample = distance / (samples.size() - 1);
+    double distance           = sqrt( ((xStart - xEnd) * (xStart - xEnd)) +
+                                      ((yStart - yEnd) * (yStart - yEnd)) );
+    // The "as the crow flies" distance travelled between each sample
+    double distancePerSample  = distance / (samples.size() - 1);
     // The angle of travel relative to the plane of the map
-    double theta             = atan( fabs(yStart - yEnd) / fabs(xStart - xEnd) );
-    int n = 0;
-    for (std::vector<Sample *>::iterator it = samples.begin(); it != samples.end(); it++) {
-        double x = xStart + ( n * distancePerSample * cos(theta) );
-        double y = yStart + ( n * distancePerSample * sin(theta) );
+    double theta              = atan( fabs(yStart - yEnd) / fabs(xStart - xEnd) );
+    // The x & y components of the distance travelled between each sample
+    double xDistancePerSample = distancePerSample * cos(theta);
+    double yDistancePerSample = distancePerSample * sin(theta);
+    unsigned int n = 0;
+    for (QList<Sample *>::iterator it = samples.begin(); it != samples.end(); it++) {
+        double x = xStart + (n * xDistancePerSample);
+        double y = yStart + (n * yDistancePerSample);
         x = round(x);
         y = round(y);
         // Here is where we connect to the database
@@ -48,34 +65,4 @@ void Logger::run() {
               // insert new entry
         n++;
     }
-
 }
-
-
-/*
-std::vector<Sample *> Logger::begin(int xStart, int yStart, int xEnd, int yEnd) {
-    time_t startTime = time(0);
-    std::vector<Sample *> samples;
-    while (true) {
-         QApplication::processEvents();
-        if (stopRequested) break;
-        samples.push_back( new Sample( r.readLine() ) );
-    }
-    time_t endTime           = time(0);
-    double distance          = sqrt( ((xStart - xEnd) * (xStart - xEnd)) +
-                                     ((yStart - yEnd) * (yStart - yEnd)) );
-    double distancePerSample = distance / (samples.size() - 1);
-    double theta             = atan( fabs(yStart - yEnd) / fabs(xStart - xEnd) );
-    int n = 0;
-    for (std::vector<Sample *>::iterator it = samples.begin(); it != samples.end(); it++) {
-        double x = xStart + ( n * distancePerSample * cos(theta) );
-        double y = yStart + ( n * distancePerSample * sin(theta) );
-        x = round(x);
-        y = round(y);
-        //if ( pointExists(x, y) ) {
-            //update with average
-        //}
-        n++;
-    }
-}
-*/

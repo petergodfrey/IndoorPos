@@ -18,14 +18,12 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     reader.cpp \
     sample.cpp \
-    logger.cpp \
-    socket.cpp
+    logger.cpp
 
 HEADERS  += mainwindow.h \
     reader.h \
     sample.h \
-    logger.h \
-    socket.h
+    logger.h
 
 FORMS    += mainwindow.ui
 
