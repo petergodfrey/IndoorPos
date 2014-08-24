@@ -1,20 +1,21 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
-#include <iostream>
-#include <string>
-
-#include "reader.h"
 #include "logger.h"
+#include "databasedriver.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    l = new Logger(this);
+    c = new Configurator();
+    DatabaseDriver *db = new DatabaseDriver( c->databaseAddress(), c->databasePort(), c->databaseName() );
+    l = new Logger(c->hostAddress(), c->hostPort(), db, this);
+    l->setFloorPlanID(ui->floorPlanIDLineEdit->text().toInt());
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete l;
+    delete c;
 }
 
 void MainWindow::on_startButton_clicked() {

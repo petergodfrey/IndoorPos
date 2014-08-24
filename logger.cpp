@@ -1,27 +1,35 @@
 #include "logger.h"
-
-#include <QDebug>
-
 #include "sample.h"
 #include <QList>
 #include <cmath>
 
 #define MIN_LINE_LENGTH 106
 
-Logger::Logger(QObject *parent) :
-    QThread (parent),
-    stop    (true),
-    xStart  (0),
-    yStart  (0),
-    xEnd    (0),
-    yEnd    (0) {
+Logger::Logger(QString address, int port, DatabaseDriver *_db, QObject *parent) :
+    QThread      (parent),
+    stop         (true),
+    xStart       (0),
+    yStart       (0),
+    xEnd         (0),
+    yEnd         (0),
+    db           (_db),
+    floorPlanID  (-1) {
+
     socket = new QTcpSocket(this);
-    socket->connectToHost("192.168.0.10", 51600);
-    if ( socket->waitForConnected(1000) ) {
-        qDebug() << "Connected";
+    socket->connectToHost(address, port);
+    if ( socket->waitForConnected(10000) ) {
+        qDebug() << "Connected to host";
     } else {
-        qDebug() << "Connection Failed";
+        qDebug() << "Connection to host failed";
     }
+}
+
+Logger::~Logger() {
+    delete socket;
+}
+
+void Logger::setFloorPlanID(int _floorPlanID) {
+    floorPlanID = _floorPlanID;
 }
 
 void Logger::run() {
@@ -42,27 +50,21 @@ void Logger::run() {
         qDebug() << line;
         samples.append( new Sample(line) );
     }
-    // Euclidian distance between start & end coordinates
     double distance           = sqrt( ((xStart - xEnd) * (xStart - xEnd)) +
                                       ((yStart - yEnd) * (yStart - yEnd)) );
-    // The "as the crow flies" distance travelled between each sample
     double distancePerSample  = distance / (samples.size() - 1);
-    // The angle of travel relative to the plane of the map
     double theta              = atan( fabs(yStart - yEnd) / fabs(xStart - xEnd) );
-    // The x & y components of the distance travelled between each sample
     double xDistancePerSample = distancePerSample * cos(theta);
     double yDistancePerSample = distancePerSample * sin(theta);
     unsigned int n = 0;
     for (QList<Sample *>::iterator it = samples.begin(); it != samples.end(); it++) {
-        double x = xStart + (n * xDistancePerSample);
-        double y = yStart + (n * yDistancePerSample);
-        x = round(x);
-        y = round(y);
-        // Here is where we connect to the database
-        //if data for the point (x, y) already exists
-              //update with average
-        //else
-              // insert new entry
+        double xd = xStart + (n * xDistancePerSample);
+        double yd = yStart + (n * yDistancePerSample);
+        int x = round(xd);
+        int y = round(yd);
+        (*it)->setCoordinates(x, y);
+        (*it)->setFloorPlanID(floorPlanID);
+        db->addSample(**it);
         n++;
     }
 }

@@ -3,17 +3,23 @@
 
 #include <QString>
 
+#define NOT_SET -1
+
 class Sample {
 
 private:
-    QString time;
-    QString timestamp;
-    QString recordTime;
-    int     horizontalIntensity;
-    int     verticalIntensity;
 
 public:
+    QString time;
+    int     floorPlanID;
+    int     x;
+    int     y;
+    double  horizontalIntensity;
+    double  verticalIntensity;
+
     Sample(QString line);
+    void setCoordinates(int x, int y);
+    void setFloorPlanID(int floorPlanID);
 
 };
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>378</width>
-    <height>205</height>
+    <width>339</width>
+    <height>260</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,50 +17,24 @@
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>100</y>
-      <width>162</width>
-      <height>33</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="startButton">
-       <property name="text">
-        <string>Start</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="stopButton">
-       <property name="text">
-        <string>Stop</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
       <x>30</x>
       <y>30</y>
-      <width>297</width>
-      <height>58</height>
+      <width>264</width>
+      <height>135</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Start Coordinates</string>
+          <string>Floor Plan ID</string>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer">
+        <spacer name="horizontalSpacer_3">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -73,7 +47,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLineEdit" name="xStartLineEdit">
+        <widget class="QLineEdit" name="floorPlanIDLineEdit">
          <property name="maximumSize">
           <size>
            <width>51</width>
@@ -84,82 +58,147 @@
           <string/>
          </property>
          <property name="text">
-          <string>0</string>
+          <string>1</string>
          </property>
          <property name="placeholderText">
           <string>x</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="yStartLineEdit">
-         <property name="maximumSize">
-          <size>
-           <width>51</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>0</string>
-         </property>
-         <property name="placeholderText">
-          <string>y</string>
          </property>
         </widget>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QLabel" name="label_2">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Start Coordinates</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>18</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="xStartLineEdit">
+           <property name="maximumSize">
+            <size>
+             <width>51</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="inputMask">
+            <string/>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="placeholderText">
+            <string>x</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="yStartLineEdit">
+           <property name="maximumSize">
+            <size>
+             <width>51</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="placeholderText">
+            <string>y</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>End Coordinates</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>18</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="xEndLineEdit">
+           <property name="maximumSize">
+            <size>
+             <width>51</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="placeholderText">
+            <string>x</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="yEndLineEdit">
+           <property name="maximumSize">
+            <size>
+             <width>51</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>88</string>
+           </property>
+           <property name="placeholderText">
+            <string>y</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="startButton">
          <property name="text">
-          <string>End Coordinates</string>
+          <string>Start</string>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>18</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="xEndLineEdit">
-         <property name="maximumSize">
-          <size>
-           <width>51</width>
-           <height>16777215</height>
-          </size>
-         </property>
+        <widget class="QPushButton" name="stopButton">
          <property name="text">
-          <string>0</string>
-         </property>
-         <property name="placeholderText">
-          <string>x</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="yEndLineEdit">
-         <property name="maximumSize">
-          <size>
-           <width>51</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>88</string>
-         </property>
-         <property name="placeholderText">
-          <string>y</string>
+          <string>Stop</string>
          </property>
         </widget>
        </item>
@@ -167,27 +206,13 @@
      </item>
     </layout>
    </widget>
-   <zorder>startButton</zorder>
-   <zorder>stopButton</zorder>
-   <zorder>xStartLineEdit</zorder>
-   <zorder>yStartLineEdit</zorder>
-   <zorder>yEndLineEdit</zorder>
-   <zorder>xEndLineEdit</zorder>
-   <zorder>startButton</zorder>
-   <zorder>label</zorder>
-   <zorder>label_2</zorder>
-   <zorder>horizontalSpacer</zorder>
-   <zorder>stopButton</zorder>
-   <zorder>stopButton</zorder>
-   <zorder>horizontalSpacer_2</zorder>
-   <zorder>yEndLineEdit</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>378</width>
+     <width>339</width>
      <height>22</height>
     </rect>
    </property>

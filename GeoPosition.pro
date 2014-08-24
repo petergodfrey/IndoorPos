@@ -5,8 +5,8 @@
 #-------------------------------------------------
 
 QT += core gui
-
 QT += network
+QT += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,14 +16,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    reader.cpp \
     sample.cpp \
-    logger.cpp
+    logger.cpp \
+    databasedriver.cpp \
+    configurator.cpp
 
 HEADERS  += mainwindow.h \
-    reader.h \
     sample.h \
-    logger.h
+    logger.h \
+    databasedriver.h \
+    configurator.h
 
 FORMS    += mainwindow.ui
 
