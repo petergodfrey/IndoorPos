@@ -7,23 +7,14 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    c = new Configurator();
-    DatabaseDriver *db = new DatabaseDriver( c->databaseAddress(), c->databasePort(), c->databaseName() );
-    l = new Logger(c->hostAddress(), c->hostPort(), db, this);
+    c  = new Configurator();
+    db = new DatabaseDriver( c->databaseAddress(), c->databasePort(), c->databaseName() );
+    l  = new Logger(c->hostAddress(), c->hostPort(), db, this);
 
-    // Set up Tree
     QVector< QPair<QString, int> > b = db->getBuildings();
-    for (QVector< QPair<QString, int> >::iterator bIt = b.begin(); bIt != b.end(); bIt++) {
-        QTreeWidgetItem *i = new QTreeWidgetItem(ui->treeWidget);
-        i->setText(0, bIt->first);
-        QStringList f = db->getFloorplanNames(bIt->second);
-        for (QStringList::iterator fIt = f.begin(); fIt != f.end(); fIt++) {
-            QTreeWidgetItem *j = new QTreeWidgetItem();
-            j->setText(0, *fIt);
-            i->addChild(j);
-        }
+    for (QVector< QPair<QString, int> >::iterator it = b.begin(); it != b.end(); it++) {
+        ui->buildingComboBox->addItem(it->first, it->second);
     }
-    l->setFloorPlanID(ui->floorPlanIDLineEdit->text().toInt());
 }
 
 MainWindow::~MainWindow()
@@ -46,4 +37,16 @@ void MainWindow::on_startButton_clicked() {
 
 void MainWindow::on_stopButton_clicked() {
     l->stop = true;
+}
+
+void MainWindow::on_buildingComboBox_currentIndexChanged(int index) {
+    ui->floorPlanComboBox->clear();
+    QVector< QPair<QString, int> > b = db->getFloorplanNames( ui->buildingComboBox->itemData(index).toInt() );
+    for (QVector< QPair<QString, int> >::iterator it = b.begin(); it != b.end(); it++) {
+         ui->floorPlanComboBox->addItem(it->first, it->second);
+    }
+}
+
+void MainWindow::on_floorPlanComboBox_currentIndexChanged(int index) {
+    l->setFloorPlanID( ui->floorPlanComboBox->itemData(index).toInt() );
 }

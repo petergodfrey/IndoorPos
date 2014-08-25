@@ -21,30 +21,32 @@ QVector< QPair<QString, int> >DatabaseDriver::getBuildings(void) {
     QString   t;
     t = QString(
         "SELECT name, id "
-        "FROM   Buildings;"
+        "FROM   Buildings "
+        "ORDER BY name;"
         );
     q.exec(t);
     QVector< QPair<QString, int> > v;
     while ( q.next() ) {
-        v.append( QPair<QString, int>(q.value(0).toString(), q.value(1).toInt() ) );
+        v.append( QPair<QString, int>( q.value(0).toString(), q.value(1).toInt() ) );
     }
     return v;
 }
 
-QStringList DatabaseDriver::getFloorplanNames(int building) {
+QVector< QPair<QString, int> > DatabaseDriver::getFloorplanNames(int building) {
     QSqlQuery q;
     QString   t;
     t = QString(
-        "SELECT name "
+        "SELECT name, id "
         "FROM   Floorplans "
-        "WHERE  building = %1;"
+        "WHERE  building = %1 "
+        "ORDER BY name;"
         ).arg(building);
     q.exec(t);
-    QStringList l;
+    QVector< QPair<QString, int> > v;
     while ( q.next() ) {
-        l.append( q.value(0).toString() );
+        v.append( QPair<QString, int>( q.value(0).toString(), q.value(1).toInt() ) );
     }
-    return l;
+    return v;
 }
 
 

@@ -7,7 +7,6 @@
 #include <QVector>
 #include <QPair>
 #include <QString>
-#include <QStringList>
 
 class DatabaseDriver : public QObject {
 
@@ -18,7 +17,7 @@ public:
     ~DatabaseDriver(void);
     void addSample(Sample sample);
     QVector< QPair<QString, int> > getBuildings(void);
-    QStringList getFloorplanNames(int building);
+    QVector< QPair<QString, int> > getFloorplanNames(int building);
 private:
     QSqlDatabase db;
 
