@@ -1,7 +1,10 @@
+#include <QFile>
+#include <QTextStream>
+#include <QString>
 #include "configurator.h"
 
-Configurator::Configurator() {
-    mHostAddress     = "192.168.0.10";
+Configurator::Configurator() {    
+    mHostAddress     = "10.248.165.51"; //"192.168.0.10";
     mHostPort        = 51600;
     mDatabaseAddress = "localhost";
     mDatabasePort    = 5432;

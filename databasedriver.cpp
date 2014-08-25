@@ -16,9 +16,31 @@ DatabaseDriver::~DatabaseDriver() {
     db.close();
 }
 
-/*
- * Adds sample data to the database
- */
+QVector< QPair<QString, int> >DatabaseDriver::getBuildings(void) {
+    QSqlQuery q;
+    QString   s;
+    s = QString("select name, id from Buildings;");
+    q.exec(s);
+    QVector< QPair<QString, int> > v;
+    while ( q.next() ) {
+        v.append( QPair<QString, int>(q.value(0).toString(), q.value(1).toInt() ) );
+    }
+    return v;
+}
+
+QStringList DatabaseDriver::getFloorplanNames(int building) {
+    QSqlQuery q;
+    QString   s;
+    s = QString("select name from Floorplans where building = %1;").arg(building);
+    q.exec(s);
+    QStringList l;
+    while ( q.next() ) {
+        l.append( q.value(0).toString() );
+    }
+    return l;
+}
+
+
 void DatabaseDriver::addSample(Sample s) {
     QSqlQuery q;
     QString   t;
