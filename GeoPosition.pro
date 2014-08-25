@@ -19,14 +19,22 @@ SOURCES += main.cpp\
     sample.cpp \
     logger.cpp \
     databasedriver.cpp \
-    configurator.cpp
+    configurator.cpp \
+    addbuildingwindow.cpp \
+    addfloorplanwindow.cpp
 
 HEADERS  += mainwindow.h \
     sample.h \
     logger.h \
     databasedriver.h \
-    configurator.h
+    configurator.h \
+    addbuildingwindow.h \
+    addfloorplanwindow.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    addbuildingwindow.ui \
+    addfloorplanwindow.ui
 
 CONFIG += c++11
+
+RESOURCES +=

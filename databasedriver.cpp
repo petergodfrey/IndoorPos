@@ -76,6 +76,34 @@ void DatabaseDriver::addSample(Sample s) {
     if ( q.exec(t) ) {
         qDebug() << "addSample Success";
     } else {
-        qDebug() << "addSample ERROR";
+        qDebug() << "ERROR: DatabaseDriver::addSample " << db.lastError().text();
+    }
+}
+
+void DatabaseDriver::addBuilding(QString name, QString address) {
+    QSqlQuery q;
+    QString   t;
+    t = QString(
+        "INSERT INTO Buildings (name, address) "
+        "VALUES ('%1', '%2');"
+        ).arg(name).arg(address);
+    if ( q.exec(t) ) {
+        qDebug() << "addBuilding Success";
+    } else {
+        qDebug() << "ERROR: DatabaseDriver::addBuilding " << db.lastError().text();
+    }
+}
+
+void DatabaseDriver::addFloorplan(int building, QString name, QString level, QString map) {
+    QSqlQuery q;
+    QString   t;
+    t = QString(
+        "INSERT INTO FloorPlans (building, name, level, map) "
+        "VALUES (%1, '%2', '%3', '%4');"
+        ).arg(building).arg(name).arg(level).arg(map);
+    if ( q.exec(t) ) {
+        qDebug() << "addFloorplan Success";
+    } else {
+        qDebug() << "ERROR: DatabaseDriver::addFloorplan " << db.lastError().text();
     }
 }

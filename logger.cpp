@@ -17,7 +17,7 @@ Logger::Logger(QString address, int port, DatabaseDriver *_db, QObject *parent) 
 
     socket = new QTcpSocket(this);
     socket->connectToHost(address, port);
-    if ( socket->waitForConnected(10000) ) {
+    if ( socket->waitForConnected(1000) ) {
         qDebug() << "Connected to host";
     } else {
         qDebug() << "Connection to host failed";

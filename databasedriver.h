@@ -16,6 +16,8 @@ public:
     explicit DatabaseDriver(QString address, int port, QString name, QObject *parent = 0);
     ~DatabaseDriver(void);
     void addSample(Sample sample);
+    void addBuilding(QString name, QString address);
+    void addFloorplan(int building, QString name, QString level, QString map);
     QVector< QPair<QString, int> > getBuildings(void);
     QVector< QPair<QString, int> > getFloorplanNames(int building);
 private:
