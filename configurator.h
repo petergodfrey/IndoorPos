@@ -8,11 +8,11 @@ class Configurator {
 public:
     Configurator();
     ~Configurator();
-    QString hostAddress(void);
-    int     hostPort(void);
-    QString databaseAddress(void);
-    int     databasePort(void);
-    QString databaseName(void);
+    QString hostAddress();
+    int     hostPort();
+    QString databaseAddress();
+    int     databasePort();
+    QString databaseName();
 
 private:
     QString mHostAddress;
