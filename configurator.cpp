@@ -15,22 +15,22 @@ Configurator::~Configurator() {
 
 }
 
-QString Configurator::hostAddress(void) {
+QString Configurator::hostAddress() {
     return mHostAddress;
 }
 
-int Configurator::hostPort(void) {
+int Configurator::hostPort() {
     return mHostPort;
 }
 
-QString Configurator::databaseAddress(void) {
+QString Configurator::databaseAddress() {
     return mDatabaseAddress;
 }
 
-int Configurator::databasePort(void) {
+int Configurator::databasePort() {
     return mDatabasePort;
 }
 
-QString Configurator::databaseName(void) {
+QString Configurator::databaseName() {
     return mDatabaseName;
 }

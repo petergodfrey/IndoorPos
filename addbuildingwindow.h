@@ -15,8 +15,8 @@ class AddBuildingWindow : public QDialog {
 public:
     explicit AddBuildingWindow(QWidget *parent = 0);
     ~AddBuildingWindow();
-    QString getBuildingName(void);
-    QString getBuildingAddress(void);
+    QString getBuildingName();
+    QString getBuildingAddress();
 
 private:
     QString buildingName;

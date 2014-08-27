@@ -16,7 +16,7 @@ DatabaseDriver::~DatabaseDriver() {
     db.close();
 }
 
-QVector< QPair<QString, int> >DatabaseDriver::getBuildings(void) {
+QVector< QPair<QString, int> >DatabaseDriver::getBuildings() {
     QSqlQuery q;
     QString   t;
     t = QString(
@@ -32,7 +32,7 @@ QVector< QPair<QString, int> >DatabaseDriver::getBuildings(void) {
     return v;
 }
 
-QVector< QPair<QString, int> > DatabaseDriver::getFloorplanNames(int building) {
+QVector< QPair<QString, int> > DatabaseDriver::getFloorplans(int building) {
     QSqlQuery q;
     QString   t;
     t = QString(
@@ -49,6 +49,18 @@ QVector< QPair<QString, int> > DatabaseDriver::getFloorplanNames(int building) {
     return v;
 }
 
+QString DatabaseDriver::getFloorPlanImagePath(int floorPlan) {
+    QSqlQuery q;
+    QString   t;
+    t = QString(
+        "SELECT map "
+        "FROM   Floorplans "
+        "WHERE  id = %1;"
+        ).arg(floorPlan);
+    q.exec(t);
+    q.next();
+    return q.value(0).toString();
+}
 
 void DatabaseDriver::addSample(Sample s) {
     QSqlQuery q;

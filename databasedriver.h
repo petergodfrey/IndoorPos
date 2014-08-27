@@ -14,12 +14,15 @@ class DatabaseDriver : public QObject {
 
 public:
     explicit DatabaseDriver(QString address, int port, QString name, QObject *parent = 0);
-    ~DatabaseDriver(void);
+    ~DatabaseDriver();
+    QVector< QPair<QString, int> > getBuildings();
+    QVector< QPair<QString, int> > getFloorplans(int building);
+    QString getFloorPlanImagePath(int floorPlan);
     void addSample(Sample sample);
     void addBuilding(QString name, QString address);
     void addFloorplan(int building, QString name, QString level, QString map);
-    QVector< QPair<QString, int> > getBuildings(void);
-    QVector< QPair<QString, int> > getFloorplanNames(int building);
+
+
 private:
     QSqlDatabase db;
 

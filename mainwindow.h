@@ -30,8 +30,9 @@ private slots:
     void on_buildingComboBox_currentIndexChanged(int index);
     void on_floorPlanComboBox_currentIndexChanged(int index);
     void on_addNewBuildingPushButton_clicked();
-
     void on_addNewFloorPlanPushButton_clicked();
+    void on_zoomInPushButton_clicked();
+    void on_zoomOutPushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
