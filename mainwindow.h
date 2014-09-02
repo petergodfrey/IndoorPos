@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "logger.h"
 #include "configurator.h"
+#include "imageviewer.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,6 +22,7 @@ public:
     DatabaseDriver *db;
 
 private:
+    ImageViewer *imageViewer;
     void updateBuildingComboBox();
     void updateFloorPlanComboBox();
 

@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <ctime>
+#include <QSizePolicy>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QPixmap>
@@ -13,14 +14,24 @@
 #include "ui_mainwindow.h"
 #include "logger.h"
 #include "databasedriver.h"
+#include "Exceptions/databaseexception.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    c  = new Configurator();
-    db = new DatabaseDriver( c->databaseAddress(), c->databasePort(), c->databaseName() );
-    l  = new Logger(c->hostAddress(), c->hostPort(), db, this);
-
-
+    try {
+        c  = new Configurator();
+        db = new DatabaseDriver( c->databaseAddress(), c->databasePort(), c->databaseName() );
+        l  = new Logger(c->hostAddress(), c->hostPort(), db, this);
+    }
+    catch (DatabaseException *dbE) {
+        QMessageBox e;
+        e.setWindowTitle("ERROR");
+        e.setText( dbE->message().append("\nCheck configuration file and that the server is running") );
+        e.exec();
+    }
+    imageViewer = new ImageViewer(this);
+    imageViewer->setWidgetResizable(true);
+    ui->verticalLayout->addWidget(imageViewer);
     updateBuildingComboBox();
 
 }
@@ -50,15 +61,7 @@ void MainWindow::on_buildingComboBox_currentIndexChanged(int index) {
 void MainWindow::on_floorPlanComboBox_currentIndexChanged(int index) {
     int floorPlan = ui->floorPlanComboBox->itemData(index).toInt();
     l->setFloorPlanID(floorPlan);
-
-    QGraphicsScene* scene = new QGraphicsScene();
-    scene->setSceneRect( ui->graphicsView->sceneRect() );
-    ui->graphicsView->setScene(scene);
-    QImage image( db->getFloorPlanImagePath(floorPlan) );
-    QGraphicsPixmapItem* item =
-        new QGraphicsPixmapItem( QPixmap::fromImage(image) );
-    scene->addItem(item);
-    ui->graphicsView->fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
+    imageViewer->open( db->getFloorPlanImagePath(floorPlan) );
 }
 
 
@@ -108,9 +111,10 @@ void MainWindow::updateFloorPlanComboBox() {
 }
 
 void MainWindow::on_zoomInPushButton_clicked() {
-    ui->graphicsView->scale(1.2, 1.2);
+    imageViewer->zoomIn();
+
 }
 
 void MainWindow::on_zoomOutPushButton_clicked() {
-    ui->graphicsView->scale(0.8, 0.8);
+    imageViewer->zoomOut();
 }

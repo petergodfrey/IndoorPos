@@ -1,14 +1,14 @@
 #include "databasedriver.h"
+#include "Exceptions/databaseexception.h"
+#include <QMessageBox>
 
 DatabaseDriver::DatabaseDriver(QString address, int port, QString name, QObject *parent) : QObject(parent) {
     db = QSqlDatabase::addDatabase("QPSQL");
     db.setHostName(address);
     db.setPort(port);
     db.setDatabaseName(name);
-    if ( db.open() ) {
-        qDebug() << "Database Opened";
-    } else {
-        qDebug() << "DatabaseDriver() ERROR: " << db.lastError().text();
+    if ( !db.open() ) {
+        throw new DatabaseException();
     }
 }
 

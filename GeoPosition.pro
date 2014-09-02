@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     databasedriver.cpp \
     configurator.cpp \
     addbuildingwindow.cpp \
-    addfloorplanwindow.cpp
+    addfloorplanwindow.cpp \
+    Exceptions/databaseexception.cpp \
+    imageviewer.cpp
 
 HEADERS  += mainwindow.h \
     sample.h \
@@ -29,7 +31,9 @@ HEADERS  += mainwindow.h \
     databasedriver.h \
     configurator.h \
     addbuildingwindow.h \
-    addfloorplanwindow.h
+    addfloorplanwindow.h \
+    Exceptions/databaseexception.h \
+    imageviewer.h
 
 FORMS    += mainwindow.ui \
     addbuildingwindow.ui \

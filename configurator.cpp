@@ -4,7 +4,7 @@
 #include "configurator.h"
 
 Configurator::Configurator() {    
-    mHostAddress     = "10.248.165.51"; //"192.168.0.10";
+    mHostAddress     = "192.168.0.10";
     mHostPort        = 51600;
     mDatabaseAddress = "localhost";
     mDatabasePort    = 5432;
