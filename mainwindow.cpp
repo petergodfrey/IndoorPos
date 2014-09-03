@@ -34,10 +34,35 @@ MainWindow::~MainWindow() {
     delete c;
 }
 
+void MainWindow::updateBuildingComboBox() {
+    ui->buildingComboBox->clear();
+    QVector< QPair<QString, int> > b = db->getBuildings();
+    for (QVector< QPair<QString, int> >::iterator it = b.begin(); it != b.end(); it++) {
+        ui->buildingComboBox->addItem(it->first, it->second);
+    }
+}
+
+void MainWindow::updateFloorPlanComboBox() {
+    ui->floorPlanComboBox->clear();
+    QVector< QPair<QString, int> > b = db->getFloorplans( ui->buildingComboBox->currentData().toInt() );
+    for (QVector< QPair<QString, int> >::iterator it = b.begin(); it != b.end(); it++) {
+         ui->floorPlanComboBox->addItem(it->first, it->second);
+    }
+}
+
 void MainWindow::on_startButton_clicked() {
-    if (l->stop == true) { // Only proceed if thread has been stopped
-        l->stop   = false;
-        l->start();
+    if ( !imageViewer->pointsAreSet() ) {
+        QMessageBox e;
+        e.setWindowTitle("ERROR");
+        e.setText("Start & end points must be selected");
+        e.exec();
+    } else {
+        if (l->stop == true) { // Only proceed if thread has been stopped
+            l->setStartPoint( imageViewer->startPoint() );
+            l->setEndPoint( imageViewer->endPoint() );
+            l->stop = false;
+            l->start();
+        }
     }
 }
 
@@ -83,22 +108,6 @@ void MainWindow::on_addNewFloorPlanPushButton_clicked() {
         }
         db->addFloorplan(ui->buildingComboBox->currentData().toInt(), w.getFloorPlanName(), w.getFloorPlanLevel(), newFilePath);
         updateFloorPlanComboBox();
-    }
-}
-
-void MainWindow::updateBuildingComboBox() {
-    ui->buildingComboBox->clear();
-    QVector< QPair<QString, int> > b = db->getBuildings();
-    for (QVector< QPair<QString, int> >::iterator it = b.begin(); it != b.end(); it++) {
-        ui->buildingComboBox->addItem(it->first, it->second);
-    }
-}
-
-void MainWindow::updateFloorPlanComboBox() {
-    ui->floorPlanComboBox->clear();
-    QVector< QPair<QString, int> > b = db->getFloorplans( ui->buildingComboBox->currentData().toInt() );
-    for (QVector< QPair<QString, int> >::iterator it = b.begin(); it != b.end(); it++) {
-         ui->floorPlanComboBox->addItem(it->first, it->second);
     }
 }
 

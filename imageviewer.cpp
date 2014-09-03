@@ -92,7 +92,6 @@ void ImageViewer::scaleImage(double factor) {
 }
 
 void ImageViewer::normalSize() {
-    //imageLabel->setPixmap( pixmap.scaledToWidth( imageLabel->width() ) );
     scaleFactor = 1.0;
     imageLabel.setPixmap( pixmap.scaled( pixmap.height(), pixmap.width() ) );
 }

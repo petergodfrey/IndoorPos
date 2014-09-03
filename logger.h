@@ -14,11 +14,9 @@ public:
     ~Logger();
     void run();
     void setFloorPlanID(int floorPlanID);
+    void setStartPoint(QPoint p);
+    void setEndPoint(QPoint p);
     bool stop;
-    int  xStart;
-    int  yStart;
-    int  xEnd;
-    int  yEnd;
 
 private:
     QTcpSocket     *socket;
@@ -27,6 +25,8 @@ private:
     QString         databaseName;
     QString         databaseServerName;
     int             databasePort;
+    QPoint          startPoint;
+    QPoint          endPoint;
 
 signals:
 

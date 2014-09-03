@@ -8,10 +8,6 @@
 Logger::Logger(QString address, int port, DatabaseDriver *_db, QObject *parent) :
     QThread      (parent),
     stop         (true),
-    xStart       (0),
-    yStart       (0),
-    xEnd         (0),
-    yEnd         (0),
     db           (_db),
     floorPlanID  (-1) {
 
@@ -32,6 +28,16 @@ void Logger::setFloorPlanID(int _floorPlanID) {
     floorPlanID = _floorPlanID;
 }
 
+void Logger::setStartPoint(QPoint p) {
+    startPoint.setX( p.x() );
+    startPoint.setY( p.y() );
+}
+
+void Logger::setEndPoint(QPoint p) {
+    endPoint.setX( p.x() );
+    endPoint.setY( p.y() );
+}
+
 void Logger::run() {
     QList<Sample *> samples;
     socket->readAll(); // Flush
@@ -50,16 +56,16 @@ void Logger::run() {
         qDebug() << line;
         samples.append( new Sample(line) );
     }
-    double distance           = sqrt( ((xStart - xEnd) * (xStart - xEnd)) +
-                                      ((yStart - yEnd) * (yStart - yEnd)) );
+    double distance           = sqrt( ( (startPoint.x() - endPoint.x()) * (startPoint.x() - endPoint.x()) ) +
+                                      ( (startPoint.y() - endPoint.y()) * (startPoint.y() - endPoint.y()) ) );
     double distancePerSample  = distance / (samples.size() - 1);
-    double theta              = atan( fabs(yStart - yEnd) / fabs(xStart - xEnd) );
+    double theta              = atan( fabs( startPoint.y() - endPoint.y() ) / fabs( startPoint.x() - endPoint.x() ) );
     double xDistancePerSample = distancePerSample * cos(theta);
     double yDistancePerSample = distancePerSample * sin(theta);
     unsigned int n = 0;
     for (QList<Sample *>::iterator it = samples.begin(); it != samples.end(); it++) {
-        double xd = xStart + (n * xDistancePerSample);
-        double yd = yStart + (n * yDistancePerSample);
+        double xd = startPoint.x() + (n * xDistancePerSample);
+        double yd = startPoint.y() + (n * yDistancePerSample);
         int x = round(xd);
         int y = round(yd);
         (*it)->setCoordinates(x, y);

@@ -4,15 +4,11 @@
 #include "configurator.h"
 
 Configurator::Configurator() {    
-    mHostAddress     = "192.168.0.10";
+    mHostAddress     = "10.248.175.203"; //"192.168.0.10";
     mHostPort        = 51600;
     mDatabaseAddress = "localhost";
     mDatabasePort    = 5432;
     mDatabaseName    = "indoor";
-}
-
-Configurator::~Configurator() {
-
 }
 
 QString Configurator::hostAddress() {

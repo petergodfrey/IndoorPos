@@ -7,7 +7,6 @@ class Configurator {
 
 public:
     Configurator();
-    ~Configurator();
     QString hostAddress();
     int     hostPort();
     QString databaseAddress();
