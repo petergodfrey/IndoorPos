@@ -1,82 +1,98 @@
 #include "imageviewer.h"
-#include <QGraphicsPixmapItem>
-#include <QScrollBar>
-#include <QDebug>
-#include <QPainter>
-#include <QPen>
 
-ImageViewer::ImageViewer(QObject *parent) {
-    imageLabel = new QLabel(this);
-    this->setWidget(imageLabel);
-    scaleFactor = 1.0;
-    setStartPoint = true;
+ImageViewer::ImageViewer(QObject *parent) : imageLabel(this), scaleFactor(1.0), startPointHasBeenSet(false), endPointHasBeenSet(false) {
+    this->setWidget(&imageLabel);
 }
-
 
 void ImageViewer::open(QString filePath) {
     QImage image(filePath);
     pixmap = QPixmap::fromImage(image);
-    imageLabel->setPixmap(pixmap);
+    imageLabel.setPixmap(pixmap);
     normalSize();
 }
 
 void ImageViewer::zoomIn() {
+    startPointHasBeenSet = false;
+    endPointHasBeenSet   = false;
     scaleImage(1.2);
 }
 
 void ImageViewer::zoomOut() {
+    startPointHasBeenSet = false;
+    endPointHasBeenSet   = false;
     scaleImage(0.8);
 }
 
-void ImageViewer::mousePressEvent(QMouseEvent *mouseEvent) {
-    QPoint p = mouseEvent->pos();
-    QPoint q = imageLabel->mapFrom(this, p);
+bool ImageViewer::pointsAreSet() {
+    return startPointHasBeenSet && endPointHasBeenSet;
+}
 
-    QPixmap r = pixmap.scaled(pixmap.height() * scaleFactor, pixmap.width() * scaleFactor);
-    QPainter painter(&r);
-    QPen pen;
-    if (setStartPoint) {
-        pixmapStart.setX( q.x() );
-        pixmapStart.setY( q.y() );
-        start.setX(q.x() / scaleFactor);
-        start.setY(q.y() / scaleFactor);
-        // Draw
-        pen.setWidth(6);
-        pen.setColor(Qt::red);
-        painter.setPen(pen);
-        painter.drawPoint(q);
+QPoint ImageViewer::startPoint() {
+    return QPoint(start);
+}
+
+QPoint ImageViewer::endPoint() {
+    return QPoint(end);
+}
+
+void ImageViewer::mousePressEvent(QMouseEvent *mouseEvent) {
+    QPoint p  = imageLabel.mapFrom( this, mouseEvent->pos() );
+    QPixmap m = pixmap.scaled(pixmap.height() * scaleFactor, pixmap.width() * scaleFactor);
+    QPainter painter(&m);
+    if (!startPointHasBeenSet || endPointHasBeenSet) {
+        pixmapStart.setX( p.x() );
+        pixmapStart.setY( p.y() );
+        start.setX(p.x() / scaleFactor);
+        start.setY(p.y() / scaleFactor);
+        paintStartPoint(painter);
+        startPointHasBeenSet = true;
+        endPointHasBeenSet   = false;
     } else {
-        end.setX(q.x() / scaleFactor);
-        end.setY(q.y() / scaleFactor);
-        pixmapEnd.setX( q.x() );
-        pixmapEnd.setY( q.y() );
-        // Draw
-        pen.setWidth(6);
-        pen.setColor(Qt::red);
-        painter.setPen(pen);
-        painter.drawPoint(pixmapStart);
-        pen.setColor(Qt::blue);
-        painter.setPen(pen);
-        painter.drawPoint(pixmapEnd);
-        pen.setColor(Qt::black);
-        pen.setWidth(2);
-        painter.setPen(pen);
-        painter.drawLine(pixmapStart, pixmapEnd);
+        end.setX(p.x() / scaleFactor);
+        end.setY(p.y() / scaleFactor);
+        pixmapEnd.setX( p.x() );
+        pixmapEnd.setY( p.y() );
+        paintStartPoint(painter);
+        paintEndPoint(painter);
+        paintLine(painter);
+        endPointHasBeenSet = true;
     }
-    imageLabel->setPixmap(r);
-    setStartPoint = !setStartPoint;
+    imageLabel.setPixmap(m);
     //qDebug() << "Start: (" << start.x() << ", " << start.y() << ")";
     //qDebug() << "End:   (" << end.x()   << ", " << end.y()   << ")\n";
+}
+
+void ImageViewer::paintStartPoint(QPainter &painter) {
+    QPen pen;
+    pen.setWidth(6);
+    pen.setColor(Qt::red);
+    painter.setPen(pen);
+    painter.drawPoint(pixmapStart);
+}
+
+void ImageViewer::paintEndPoint(QPainter &painter) {
+    QPen pen;
+    pen.setWidth(6);
+    pen.setColor(Qt::blue);
+    painter.setPen(pen);
+    painter.drawPoint(pixmapEnd);
+}
+
+void ImageViewer::paintLine(QPainter &painter) {
+    QPen pen;
+    pen.setWidth(2);
+    pen.setColor(Qt::black);
+    painter.setPen(pen);
+    painter.drawLine(pixmapStart, pixmapEnd);
+}
+
+void ImageViewer::scaleImage(double factor) {
+    scaleFactor *= factor;
+    imageLabel.setPixmap( pixmap.scaled(pixmap.height() * scaleFactor, pixmap.width() * scaleFactor) );
 }
 
 void ImageViewer::normalSize() {
     //imageLabel->setPixmap( pixmap.scaledToWidth( imageLabel->width() ) );
     scaleFactor = 1.0;
-    imageLabel->setPixmap( pixmap.scaled( pixmap.height(), pixmap.width() ) );
-}
-
-
-void ImageViewer::scaleImage(double factor) {
-    scaleFactor *= factor;
-    imageLabel->setPixmap( pixmap.scaled(pixmap.height() * scaleFactor, pixmap.width() * scaleFactor) );
+    imageLabel.setPixmap( pixmap.scaled( pixmap.height(), pixmap.width() ) );
 }

@@ -1,13 +1,5 @@
-#include <QVector>
-#include <QDir>
 #include <QMessageBox>
-#include <ctime>
-#include <QSizePolicy>
-#include <QGraphicsScene>
-#include <QGraphicsPixmapItem>
-#include <QPixmap>
-#include <QImage>
-#include <QVBoxLayout>
+
 #include "addbuildingwindow.h"
 #include "addfloorplanwindow.h"
 #include "mainwindow.h"

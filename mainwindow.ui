@@ -24,7 +24,7 @@
     <property name="geometry">
      <rect>
       <x>1140</x>
-      <y>0</y>
+      <y>80</y>
       <width>53</width>
       <height>66</height>
      </rect>
@@ -71,19 +71,6 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>18</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <widget class="QComboBox" name="buildingComboBox">
            <property name="minimumSize">
             <size>
@@ -115,19 +102,6 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>18</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <widget class="QComboBox" name="floorPlanComboBox">
            <property name="minimumSize">
             <size>
@@ -151,30 +125,9 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Start</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QLabel" name="startPointLabel">
          <property name="text">
           <string/>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>End</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="endPointLabel">
-         <property name="text">
-          <string>fdfdfd</string>
          </property>
         </widget>
        </item>
