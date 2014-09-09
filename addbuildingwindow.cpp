@@ -21,10 +21,7 @@ QString AddBuildingWindow::getBuildingAddress() {
 
 void AddBuildingWindow::on_OKPushButton_clicked() {
     if ( ui->buildingNameLineEdit->text().isEmpty() ) {
-        QMessageBox e;
-        e.setWindowTitle("ERROR");
-        e.setText("Building Name cannot be empty");
-        e.exec();
+        QMessageBox::warning( this, tr("ERROR"), tr("Building name cannot be empty") );
     } else {
         buildingName    = ui->buildingNameLineEdit->text();
         buildingAddress = ui->buildingAddressLineEdit->text();

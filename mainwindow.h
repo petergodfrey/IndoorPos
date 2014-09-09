@@ -2,8 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTcpSocket>
+#include "databasedriver.h"
 #include "logger.h"
 #include "configurator.h"
+#include "matcher.h"
 #include "imageviewer.h"
 
 namespace Ui {
@@ -16,25 +19,46 @@ class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
     int             buildingID;
+    QTcpSocket     *s;
+    DatabaseDriver *db;
     Logger         *l;
     Configurator   *c;
-    DatabaseDriver *db;
+    Matcher        *m;
 
 private:
-    ImageViewer *imageViewer;
+    ImageViewer    *loggingImageViewer;
+    ImageViewer    *positioningImageViewer;
+    QSqlQueryModel *buildingComboBoxModel;
+    QSqlQueryModel *floorPlanComboBoxModel;
     void updateBuildingComboBox();
     void updateFloorPlanComboBox();
 
 private slots:
-    void on_startButton_clicked();
-    void on_stopButton_clicked();
-    void on_buildingComboBox_currentIndexChanged(int index);
-    void on_floorPlanComboBox_currentIndexChanged(int index);
-    void on_addNewBuildingPushButton_clicked();
-    void on_addNewFloorPlanPushButton_clicked();
-    void on_zoomInPushButton_clicked();
-    void on_zoomOutPushButton_clicked();
+     void on_tabWidget_currentChanged(int index);
+
+    // Logging Tab
+    void on_loggingBuildingComboBox_currentIndexChanged(int index);
+    void on_loggingFloorPlanComboBox_currentIndexChanged(int index);
+    void on_newBuildingPushButton_clicked();
+    void on_newFloorPlanPushButton_clicked();
+    void on_buildingDeletePushButton_clicked();
+    void on_floorPlanDeletePushButton_clicked();
+    void on_loggingStartButton_clicked();
+    void on_loggingStopButton_clicked() ;
+    void on_loggingZoomInPushButton_clicked();
+    void on_loggingZoomOutPushButton_clicked();
+
+    // Positioning Tab
+    void on_positioningBuildingComboBox_currentIndexChanged(int index);
+    void on_positioningFloorPlanComboBox_currentIndexChanged(int index);
+    void on_positioningZoomOutPushButton_clicked();
+    void on_positioningZoomInPushButton_clicked();
+
+    void on_positioningStartButton_clicked();
+
+    void on_positioningStopButton_clicked();
 
 private:
     Ui::MainWindow *ui;

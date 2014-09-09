@@ -15,13 +15,15 @@ public:
     bool   pointsAreSet();
     QPoint startPoint();
     QPoint endPoint();
+    void   paintLocation(QPoint p);
+    void   paintLineLogged();
+    QPixmap scaledPixmap();
 
 protected:
     void mousePressEvent(QMouseEvent *mouseEvent);
 
 private:
     void scaleImage(double factor);
-    void normalSize();
     void paintStartPoint(QPainter &painter);
     void paintEndPoint  (QPainter &painter);
     void paintLine      (QPainter &painter);

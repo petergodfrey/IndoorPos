@@ -18,6 +18,7 @@ public:
     double  verticalIntensity;
 
     Sample(QString line);
+    Sample(double _horizontalIntensity, double _verticalIntensity);
     void setCoordinates(int x, int y);
     void setFloorPlanID(int floorPlanID);
 

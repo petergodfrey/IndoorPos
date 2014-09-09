@@ -1,27 +1,18 @@
 #include "logger.h"
-#include "sample.h"
-#include <QList>
-#include <cmath>
 
 #define MIN_LINE_LENGTH 106
 
-Logger::Logger(QString address, int port, DatabaseDriver *_db, QObject *parent) :
+Logger::Logger(QTcpSocket *s, DatabaseDriver *_db, QObject *parent) :
     QThread      (parent),
+    socket       (s),
     stop         (true),
     db           (_db),
     floorPlanID  (-1) {
 
-    socket = new QTcpSocket(this);
-    socket->connectToHost(address, port);
-    if ( socket->waitForConnected(1000) ) {
-        qDebug() << "Connected to host";
-    } else {
-        qDebug() << "Connection to host failed";
-    }
 }
 
 Logger::~Logger() {
-    delete socket;
+    //delete socket;
 }
 
 void Logger::setFloorPlanID(int _floorPlanID) {
@@ -39,7 +30,7 @@ void Logger::setEndPoint(QPoint p) {
 }
 
 void Logger::run() {
-    QList<Sample *> samples;
+    samples.clear();
     socket->readAll(); // Flush
     while (true) {
         QMutex mutex;
@@ -56,6 +47,9 @@ void Logger::run() {
         qDebug() << line;
         samples.append( new Sample(line) );
     }
+}
+
+void Logger::commit() {
     double distance           = sqrt( ( (startPoint.x() - endPoint.x()) * (startPoint.x() - endPoint.x()) ) +
                                       ( (startPoint.y() - endPoint.y()) * (startPoint.y() - endPoint.y()) ) );
     double distancePerSample  = distance / (samples.size() - 1);

@@ -27,6 +27,12 @@ Sample::Sample(QString line) {
     floorPlanID         = NOT_SET;
 }
 
+Sample::Sample(double _horizontalIntensity, double _verticalIntensity) :
+    horizontalIntensity (_horizontalIntensity),
+    verticalIntensity   (_verticalIntensity) {
+
+}
+
 void Sample::setCoordinates(int _x, int _y) {
     x = _x;
     y = _y;

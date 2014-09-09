@@ -1,6 +1,8 @@
 #include "databasedriver.h"
 #include "Exceptions/databaseexception.h"
-#include <QMessageBox>
+
+#define BUILDINGS_MODEL_QUERY  "SELECT name, id FROM Buildings  ORDER BY name;"
+#define FLOORPLANS_MODEL_QUERY "SELECT name, id FROM FloorPlans ORDER BY name;"
 
 DatabaseDriver::DatabaseDriver(QString address, int port, QString name, QObject *parent) : QObject(parent) {
     db = QSqlDatabase::addDatabase("QPSQL");
@@ -10,46 +12,59 @@ DatabaseDriver::DatabaseDriver(QString address, int port, QString name, QObject 
     if ( !db.open() ) {
         throw new DatabaseException();
     }
+    mBuildingsModel             = new QSqlTableModel(this, db);
+    mLoggingFloorPlansModel     = new QSqlTableModel(this, db);
+    mPositioningFloorPlansModel = new QSqlTableModel(this, db);
 }
 
 DatabaseDriver::~DatabaseDriver() {
     db.close();
 }
 
-QVector< QPair<QString, int> >DatabaseDriver::getBuildings() {
-    QSqlQuery q;
-    QString   t;
-    t = QString(
-        "SELECT name, id "
-        "FROM   Buildings "
-        "ORDER BY name;"
-        );
-    q.exec(t);
-    QVector< QPair<QString, int> > v;
-    while ( q.next() ) {
-        v.append( QPair<QString, int>( q.value(0).toString(), q.value(1).toInt() ) );
-    }
-    return v;
+QSqlQueryModel* DatabaseDriver::buildingsModel() {
+    mBuildingsModel->setQuery(BUILDINGS_MODEL_QUERY);
+    return mBuildingsModel;
 }
 
-QVector< QPair<QString, int> > DatabaseDriver::getFloorplans(int building) {
-    QSqlQuery q;
-    QString   t;
+QSqlQueryModel* DatabaseDriver::loggingFloorPlansModel(int index) {
+    int id = mBuildingsModel->record(index).value("id").toInt();
+    QString t;
     t = QString(
-        "SELECT name, id "
-        "FROM   Floorplans "
-        "WHERE  building = %1 "
+        "SELECT   name, id "
+        "FROM     Floorplans "
+        "WHERE    building = %1 "
         "ORDER BY name;"
-        ).arg(building);
-    q.exec(t);
-    QVector< QPair<QString, int> > v;
-    while ( q.next() ) {
-        v.append( QPair<QString, int>( q.value(0).toString(), q.value(1).toInt() ) );
-    }
-    return v;
+        ).arg(id);
+    mLoggingFloorPlansModel->setQuery(t);
+    return mLoggingFloorPlansModel;
 }
 
-QString DatabaseDriver::getFloorPlanImagePath(int floorPlan) {
+QSqlQueryModel* DatabaseDriver::positioningFloorPlansModel(int index) {
+    int id = mBuildingsModel->record(index).value("id").toInt();
+    QString t;
+    t = QString(
+        "SELECT   name, id "
+        "FROM     Floorplans "
+        "WHERE    building = %1 "
+        "ORDER BY name;"
+        ).arg(id);
+    mPositioningFloorPlansModel->setQuery(t);
+    return mPositioningFloorPlansModel;
+}
+
+int DatabaseDriver::buildingID(int index) {
+    return mBuildingsModel->record(index).value("id").toInt();
+}
+
+int DatabaseDriver::loggingFloorPlanID(int index) {
+    return mLoggingFloorPlansModel->record(index).value("id").toInt();
+}
+
+int DatabaseDriver::positioningFloorPlanID(int index) {
+    return mPositioningFloorPlansModel->record(index).value("id").toInt();
+}
+
+QString DatabaseDriver::floorPlanImagePath(int floorPlan) {
     QSqlQuery q;
     QString   t;
     t = QString(
@@ -104,6 +119,7 @@ void DatabaseDriver::addBuilding(QString name, QString address) {
     } else {
         qDebug() << "ERROR: DatabaseDriver::addBuilding " << db.lastError().text();
     }
+    mBuildingsModel->setQuery(BUILDINGS_MODEL_QUERY);
 }
 
 void DatabaseDriver::addFloorplan(int building, QString name, QString level, QString map) {
@@ -118,4 +134,50 @@ void DatabaseDriver::addFloorplan(int building, QString name, QString level, QSt
     } else {
         qDebug() << "ERROR: DatabaseDriver::addFloorplan " << db.lastError().text();
     }
+    mLoggingFloorPlansModel->setQuery(FLOORPLANS_MODEL_QUERY);
+}
+
+void DatabaseDriver::deleteFloorPlan(int floorPlan) {
+    QDir d;
+    d.remove( floorPlanImagePath(floorPlan) );
+    QSqlQuery q;
+    QString   t;
+    t = QString(
+        "DELETE FROM Samples "
+        "WHERE       floorplan = %1;"
+        ).arg(floorPlan);
+    q.exec(t);
+    t = QString(
+        "DELETE FROM FloorPlans "
+        "WHERE       id = %1;"
+        ).arg(floorPlan);
+    q.exec(t);
+    mLoggingFloorPlansModel->setQuery(FLOORPLANS_MODEL_QUERY);
+}
+
+
+
+QPoint DatabaseDriver::closestPoint(Sample sample, int floorPlan) {
+    QSqlQuery q;
+    QString   t;
+    t = QString(
+        "SELECT x, y, verticalIntensity, horizontalIntensity "
+        "FROM   Samples "
+        "WHERE  floorplan = %1;"
+        ).arg(floorPlan);
+    q.exec(t);
+
+    int x = 0;
+    int y = 0;
+    double minDifference = 99999999;
+    while ( q.next() ) {
+        double horizontalDifference = fabs( sample.horizontalIntensity - q.value(3).toDouble() );
+        double verticalDifference   = fabs( sample.verticalIntensity   - q.value(2).toDouble() );
+        if ( (horizontalDifference + verticalDifference) < minDifference) {
+            minDifference = horizontalDifference + verticalDifference;
+            x = q.value(0).toInt();
+            y = q.value(1).toInt();
+        }
+    }
+    return QPoint(x, y);
 }

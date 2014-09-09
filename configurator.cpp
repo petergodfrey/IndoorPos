@@ -1,14 +1,29 @@
 #include <QFile>
-#include <QTextStream>
-#include <QString>
+#include <QDir>
+
 #include "configurator.h"
 
-Configurator::Configurator() {    
-    mHostAddress     = "10.248.175.203"; //"192.168.0.10";
-    mHostPort        = 51600;
-    mDatabaseAddress = "localhost";
-    mDatabasePort    = 5432;
-    mDatabaseName    = "indoor";
+Configurator::Configurator() :
+    mHostAddress     ("192.168.0.10"),
+    mHostPort        (51600),
+    mDatabaseAddress ("localhost"),
+    mDatabasePort    (5432),
+    mDatabaseName    ("indoor") {
+
+    /*
+    QFile file( QDir::currentPath().append("/geo.conf") );
+
+    if ( !file.open(QIODevice::ReadOnly | QIODevice::Text) ) {
+        //error
+        return;
+    }
+
+    QTextStream in(&file);
+    QString line = in.readLine();
+    while ( !line.isNull() ) {
+
+    }
+    */
 }
 
 QString Configurator::hostAddress() {

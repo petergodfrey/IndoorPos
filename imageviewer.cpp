@@ -5,21 +5,18 @@ ImageViewer::ImageViewer(QObject *parent) : imageLabel(this), scaleFactor(1.0), 
 }
 
 void ImageViewer::open(QString filePath) {
+    scaleFactor = 1.0;
     QImage image(filePath);
     pixmap = QPixmap::fromImage(image);
+    pixmap = scaledPixmap();
     imageLabel.setPixmap(pixmap);
-    normalSize();
 }
 
 void ImageViewer::zoomIn() {
-    startPointHasBeenSet = false;
-    endPointHasBeenSet   = false;
     scaleImage(1.2);
 }
 
 void ImageViewer::zoomOut() {
-    startPointHasBeenSet = false;
-    endPointHasBeenSet   = false;
     scaleImage(0.8);
 }
 
@@ -36,8 +33,9 @@ QPoint ImageViewer::endPoint() {
 }
 
 void ImageViewer::mousePressEvent(QMouseEvent *mouseEvent) {
+    if ( pixmap.isNull() ) return;
     QPoint p  = imageLabel.mapFrom( this, mouseEvent->pos() );
-    QPixmap m = pixmap.scaled(pixmap.height() * scaleFactor, pixmap.width() * scaleFactor);
+    QPixmap m = scaledPixmap();
     QPainter painter(&m);
     if (!startPointHasBeenSet || endPointHasBeenSet) {
         pixmapStart.setX( p.x() );
@@ -58,8 +56,6 @@ void ImageViewer::mousePressEvent(QMouseEvent *mouseEvent) {
         endPointHasBeenSet = true;
     }
     imageLabel.setPixmap(m);
-    //qDebug() << "Start: (" << start.x() << ", " << start.y() << ")";
-    //qDebug() << "End:   (" << end.x()   << ", " << end.y()   << ")\n";
 }
 
 void ImageViewer::paintStartPoint(QPainter &painter) {
@@ -87,11 +83,41 @@ void ImageViewer::paintLine(QPainter &painter) {
 }
 
 void ImageViewer::scaleImage(double factor) {
+    if ( pixmap.isNull() ) return;
     scaleFactor *= factor;
-    imageLabel.setPixmap( pixmap.scaled(pixmap.height() * scaleFactor, pixmap.width() * scaleFactor) );
+    startPointHasBeenSet = false;
+    endPointHasBeenSet   = false;
+    imageLabel.setPixmap( scaledPixmap() );
 }
 
-void ImageViewer::normalSize() {
-    scaleFactor = 1.0;
-    imageLabel.setPixmap( pixmap.scaled( pixmap.height(), pixmap.width() ) );
+void ImageViewer::paintLocation(QPoint p) {
+    QPixmap m = scaledPixmap();
+    QPainter painter(&m);
+    QPen pen;
+    pen.setWidth(10);
+    pen.setColor(Qt::red);
+    painter.setPen(pen);
+    painter.drawPoint(p);
+    imageLabel.setPixmap(m);
+}
+
+void ImageViewer::paintLineLogged() {
+    pixmap = pixmap.scaled(pixmap.height(), pixmap.width(),
+                           Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    QPainter painter(&pixmap);
+    QPen pen;
+    pen.setWidth(6);
+    pen.setColor( QColor(0, 255, 0, 127) );
+    painter.setPen(pen);
+    painter.drawLine(start, end);
+    imageLabel.setPixmap( scaledPixmap() );
+}
+
+QPixmap ImageViewer::scaledPixmap() {
+    return pixmap.scaled(pixmap.height() * scaleFactor, pixmap.width() * scaleFactor,
+                         Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+}
+
+bool ImageViewer::savePixmap(QString filename) {
+    pixmap.save(filename);
 }

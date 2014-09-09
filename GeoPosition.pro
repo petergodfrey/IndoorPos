@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     addbuildingwindow.cpp \
     addfloorplanwindow.cpp \
     Exceptions/databaseexception.cpp \
-    imageviewer.cpp
+    imageviewer.cpp \
+    matcher.cpp
 
 HEADERS  += mainwindow.h \
     sample.h \
@@ -33,7 +34,8 @@ HEADERS  += mainwindow.h \
     addbuildingwindow.h \
     addfloorplanwindow.h \
     Exceptions/databaseexception.h \
-    imageviewer.h
+    imageviewer.h \
+    matcher.h
 
 FORMS    += mainwindow.ui \
     addbuildingwindow.ui \

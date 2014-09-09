@@ -10,9 +10,10 @@ class Logger : public QThread {
     Q_OBJECT
 
 public:
-    explicit Logger(QString address, int port, DatabaseDriver *_db, QObject *parent = 0);
+    explicit Logger(QTcpSocket *s, DatabaseDriver *_db, QObject *parent = 0);
     ~Logger();
     void run();
+    void commit();
     void setFloorPlanID(int floorPlanID);
     void setStartPoint(QPoint p);
     void setEndPoint(QPoint p);
@@ -27,6 +28,7 @@ private:
     int             databasePort;
     QPoint          startPoint;
     QPoint          endPoint;
+    QList<Sample *> samples;
 
 signals:
 

@@ -15,20 +15,25 @@ class DatabaseDriver : public QObject {
 public:
     explicit DatabaseDriver(QString address, int port, QString name, QObject *parent = 0);
     ~DatabaseDriver();
-    QVector< QPair<QString, int> > getBuildings();
-    QVector< QPair<QString, int> > getFloorplans(int building);
-    QString getFloorPlanImagePath(int floorPlan);
-    void addSample(Sample sample);
-    void addBuilding(QString name, QString address);
-    void addFloorplan(int building, QString name, QString level, QString map);
+    QSqlQueryModel* buildingsModel();
+    QSqlQueryModel* loggingFloorPlansModel(int index);
+    QSqlQueryModel* positioningFloorPlansModel(int index);
+    int             buildingID(int index);
+    int             loggingFloorPlanID(int index);
+    int             positioningFloorPlanID(int index);
+    QString         floorPlanImagePath(int floorPlan);
+    void            addSample(Sample sample);
+    void            addBuilding(QString name, QString address);
+    void            addFloorplan(int building, QString name, QString level, QString map);
+    void            deleteFloorPlan(int floorPlan);
 
+    QPoint          closestPoint(Sample sample, int floorPlan);
 
 private:
-    QSqlDatabase db;
-
-signals:
-
-public slots:
+    QSqlDatabase    db;
+    QSqlQueryModel *mBuildingsModel;
+    QSqlQueryModel *mLoggingFloorPlansModel;
+    QSqlQueryModel *mPositioningFloorPlansModel;
 
 };
 
