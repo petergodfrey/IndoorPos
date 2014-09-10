@@ -1,34 +1,29 @@
 #ifndef MATCHER_H
 #define MATCHER_H
 
-#include <QThread>
 #include <QTcpSocket>
-
 #include "databasedriver.h"
 
-#define BUFFER_SIZE 100
-
-class Matcher : public QThread {
-
+class Matcher : public QObject {
     Q_OBJECT
 
 public:
-    explicit Matcher(QTcpSocket *s, DatabaseDriver *_db, QObject *parent = 0);
-    void run();
-    void setFloorPlanID(int _floorPlanID);
-    bool            stop;
-    QPoint          location;
+    Matcher(QTcpSocket *socket, DatabaseDriver *db);
+    void setFloorPlanID(int floorPlanID);
 
 private:
     QTcpSocket     *socket;
     DatabaseDriver *db;
     int             floorPlanID;
-
-
-signals:
-    void locationChanged();
+    QTimer          timer;
 
 public slots:
+    void start();
+    void stop();
+    void process();
+
+signals:
+    void locationChanged(const QPoint &location);
 
 };
 

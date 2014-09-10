@@ -26,6 +26,8 @@ public:
     Logger         *l;
     Configurator   *c;
     Matcher        *m;
+    QThread        *positioningThread;
+    QTimer         *timer;
 
 private:
     ImageViewer    *loggingImageViewer;
@@ -55,10 +57,9 @@ private slots:
     void on_positioningFloorPlanComboBox_currentIndexChanged(int index);
     void on_positioningZoomOutPushButton_clicked();
     void on_positioningZoomInPushButton_clicked();
-
     void on_positioningStartButton_clicked();
-
     void on_positioningStopButton_clicked();
+    void positioningLocationChanged(const QPoint &location);
 
 private:
     Ui::MainWindow *ui;

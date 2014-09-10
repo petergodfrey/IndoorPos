@@ -106,7 +106,7 @@ void ImageViewer::paintLineLogged() {
                            Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     QPainter painter(&pixmap);
     QPen pen;
-    pen.setWidth(6);
+    pen.setWidth(8);
     pen.setColor( QColor(0, 255, 0, 127) );
     painter.setPen(pen);
     painter.drawLine(start, end);
@@ -116,8 +116,4 @@ void ImageViewer::paintLineLogged() {
 QPixmap ImageViewer::scaledPixmap() {
     return pixmap.scaled(pixmap.height() * scaleFactor, pixmap.width() * scaleFactor,
                          Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-}
-
-bool ImageViewer::savePixmap(QString filename) {
-    pixmap.save(filename);
 }

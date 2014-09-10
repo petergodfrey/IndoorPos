@@ -1,6 +1,7 @@
 #include "sample.h"
 #include <cmath>
 #include <QStringList>
+#include <QDebug>
 
 #define PI 3.14159
 
@@ -17,9 +18,9 @@ Sample::Sample(QString line) {
     double bIntensity   = sqrt( (bx * bx) + (by * by) + (bz * bz) );
     double theta        = (PI / 2) -
                           acos(
-                            ( (ax * bx) + (ay * by) + (az * bz) ) /
-                            ( aIntensity * bIntensity )
-                          );
+                              ( (ax * bx) + (ay * by) + (az * bz) ) /
+                              ( aIntensity * bIntensity )
+                              );
     horizontalIntensity = bIntensity * cos(theta);
     verticalIntensity   = bIntensity * sin(theta);
     x                   = NOT_SET;

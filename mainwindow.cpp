@@ -9,24 +9,29 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    try {
-        c  = new Configurator();
-        db = new DatabaseDriver( c->databaseAddress(), c->databasePort(), c->databaseName() );
-        s  = new QTcpSocket(this);
-        s->connectToHost( c->hostAddress(), c->hostPort() );
-        if ( s->waitForConnected(1000) ) {
-            qDebug() << "Connected to host";
-        } else {
-            qDebug() << "Connection to host failed";
-        }
-        l  = new Logger(s, db, this);
-        m  = new Matcher(s, db, this);
+    c  = new Configurator();
+    db = new DatabaseDriver( c->databaseAddress(), c->databasePort(), c->databaseName() );
+    s  = new QTcpSocket(this);
+    s->connectToHost( c->hostAddress(), c->hostPort() );
+    if ( s->waitForConnected(1000) ) {
+        qDebug() << "Connected to host";
+    } else {
+        qDebug() << "Connection to host failed";
     }
-    catch (DatabaseException *dbE) {
-        QMessageBox::critical(this, tr("ERROR"),
-                              tr("Could not connect to database\nCheck configuration file and that the server is running") );
-    }
-    qDebug() << "Connected to database";
+    l  = new Logger(s, db, this);
+    m  = new Matcher(s, db);
+
+    positioningThread = new QThread();
+    m->moveToThread(positioningThread);
+    connect(positioningThread, SIGNAL( started() ),               m,                 SLOT( start() ) );
+    connect(m,                 SIGNAL( locationChanged(QPoint) ), this,              SLOT( positioningLocationChanged(QPoint) ) );
+
+    //connect(m,                 SIGNAL( locationChanged(QPoint) ), positioningThread, SLOT( quit() ) );
+    //connect(m,                 SIGNAL( locationChanged(QPoint) ), m,                 SLOT( deleteLater() ) );
+    //connect(positioningThread, SIGNAL( finished() ),              positioningThread, SLOT( deleteLater() ) );
+    //timer = new QTimer();
+    //connect(timer, SIGNAL( timeout() ), positioningThread, SLOT( start() ) );
+
 
     ui->tabWidget->setCurrentIndex(0);
 
@@ -62,7 +67,7 @@ void MainWindow::on_tabWidget_currentChanged(int index) {
     if (index == 1) { // Positioning tab
 
     } else if (index == 0) {
-        m->stop = true;
+
     }
 }
 
@@ -164,6 +169,7 @@ void MainWindow::on_positioningBuildingComboBox_currentIndexChanged(int index) {
 void MainWindow::on_positioningFloorPlanComboBox_currentIndexChanged(int index) {
     int floorPlan = db->positioningFloorPlanID(index);
     positioningImageViewer->open( db->floorPlanImagePath(floorPlan) );
+    m->setFloorPlanID(floorPlan);
 }
 
 void MainWindow::on_positioningZoomInPushButton_clicked() {
@@ -175,15 +181,19 @@ void MainWindow::on_positioningZoomOutPushButton_clicked() {
 }
 
 void MainWindow::on_positioningStartButton_clicked() {
-    m->stop = false;
-    m->start();
-    positioningImageViewer->paintLocation( m->location );
+    if ( positioningThread->isRunning() ) {
+        m->start();
+    } else {
+        positioningThread->start();
+    }
 }
 
 void MainWindow::on_positioningStopButton_clicked() {
-    m->stop = true;
-    m->quit();
+    m->stop();
 }
 
+void MainWindow::positioningLocationChanged(const QPoint &location) {
+    positioningImageViewer->paintLocation(location);
+}
 
 /********************************************************************************/
