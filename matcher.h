@@ -5,21 +5,24 @@
 #include "databasedriver.h"
 
 class Matcher : public QObject {
+
     Q_OBJECT
 
 public:
     Matcher(QTcpSocket *socket, DatabaseDriver *db);
-    void setFloorPlanID(int floorPlanID);
 
 private:
     QTcpSocket     *socket;
     DatabaseDriver *db;
-    int             floorPlanID;
+    int             floorPlan;
     QTimer          timer;
+    QList<Sample>   samples;
 
 public slots:
-    void start();
+    void start(int floorPlan);
     void stop();
+
+private slots:
     void process();
 
 signals:

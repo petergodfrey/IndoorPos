@@ -15,6 +15,7 @@ class DatabaseDriver : public QObject {
 public:
     explicit DatabaseDriver(QString address, int port, QString name, QObject *parent = 0);
     ~DatabaseDriver();
+    bool            isConnected();
     QSqlQueryModel* buildingsModel();
     QSqlQueryModel* loggingFloorPlansModel(int index);
     QSqlQueryModel* positioningFloorPlansModel(int index);
@@ -22,11 +23,13 @@ public:
     int             loggingFloorPlanID(int index);
     int             positioningFloorPlanID(int index);
     QString         floorPlanImagePath(int floorPlan);
+    int             floorPlanWidth(int floorPlan);
     void            addSample(Sample sample);
     void            addBuilding(QString name, QString address);
-    void            addFloorplan(int building, QString name, QString level, QString map);
+    void            addFloorplan(int building, QString name, QString level, QString map, int width);
     void            deleteFloorPlan(int floorPlan);
 
+    QPoint          locate(Sample sample);
     QPoint          closestPoint(Sample sample, int floorPlan);
 
 private:

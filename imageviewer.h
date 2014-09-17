@@ -9,7 +9,7 @@ class ImageViewer : public QScrollArea {
 
 public:
            ImageViewer(QObject *parent = 0);
-    void   open(QString filePath);
+    void   open(QString filePath, int width);
     void   zoomIn();
     void   zoomOut();
     bool   pointsAreSet();
@@ -23,15 +23,19 @@ protected:
     void mousePressEvent(QMouseEvent *mouseEvent);
 
 private:
-    void scaleImage(double factor);
-    void paintStartPoint(QPainter &painter);
-    void paintEndPoint  (QPainter &painter);
-    void paintLine      (QPainter &painter);
+    void   scaleImage      (double factor);
+    void   paintStartPoint (QPainter &painter);
+    void   paintEndPoint   (QPainter &painter);
+    void   paintLine       (QPainter &painter);
+    QPoint transposeToGrid (QPoint p);
 
     QLabel  imageLabel;
     QPixmap pixmap;
+    QSize   gridSize;
     QPoint  start;                // Start & end points in the images frame of reference.
     QPoint  end;                  // Used for data logging. These are the positioning coordinates
+    QPoint  gridStart;
+    QPoint  gridEnd;
     QPoint  pixmapStart;          // Start & end points in the pixmaps frame
     QPoint  pixmapEnd;            // of reference. Used for painting
     double  scaleFactor;

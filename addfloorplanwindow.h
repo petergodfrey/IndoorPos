@@ -18,12 +18,14 @@ public:
     QString getFloorPlanImageFilePath();
     QString getFloorPlanName();
     QString getFloorPlanLevel();
+    int     getWidth();
 
 private:
     QString filePath;
     bool    filePathSet;
     QString floorPlanName;
     QString floorPlanLevel;
+    int     width;
 
 private slots:
     void on_toolButton_clicked();

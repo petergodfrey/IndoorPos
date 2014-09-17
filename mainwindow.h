@@ -20,22 +20,23 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    int             buildingID;
-    QTcpSocket     *s;
-    DatabaseDriver *db;
-    Logger         *l;
-    Configurator   *c;
-    Matcher        *m;
-    QThread        *positioningThread;
-    QTimer         *timer;
-
 private:
+    Configurator   *c;
+    DatabaseDriver *db;
+    QTcpSocket     *s;
+    Logger         *l;
+    Matcher        *m;
+    QThread        loggingThread;
+    QThread        positioningThread;
+    QTimer         *timer;
     ImageViewer    *loggingImageViewer;
     ImageViewer    *positioningImageViewer;
-    QSqlQueryModel *buildingComboBoxModel;
-    QSqlQueryModel *floorPlanComboBoxModel;
-    void updateBuildingComboBox();
-    void updateFloorPlanComboBox();
+
+signals:
+    void startLogging(QPoint start, QPoint end, int floorPlan);
+    void stopLogging();
+    void startPositioning(int floorPlan);
+    void stopPositioning();
 
 private slots:
      void on_tabWidget_currentChanged(int index);

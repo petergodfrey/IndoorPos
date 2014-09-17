@@ -2,41 +2,28 @@
 
 #define MIN_LINE_LENGTH 106
 
-Logger::Logger(QTcpSocket *s, DatabaseDriver *_db, QObject *parent) :
-    QThread      (parent),
-    socket       (s),
-    stop         (true),
+Logger::Logger(QTcpSocket *_socket, DatabaseDriver *_db) :
+    socket       (_socket),
     db           (_db),
-    floorPlanID  (-1) {
-
+    floorPlan    (-1),
+    startPoint   (0, 0),
+    endPoint     (0, 0),
+    samples      (),
+    mStop        (true) {
 }
 
 Logger::~Logger() {
     //delete socket;
 }
 
-void Logger::setFloorPlanID(int _floorPlanID) {
-    floorPlanID = _floorPlanID;
+bool Logger::isRunning() {
+    return !mStop;
 }
 
-void Logger::setStartPoint(QPoint p) {
-    startPoint.setX( p.x() );
-    startPoint.setY( p.y() );
-}
-
-void Logger::setEndPoint(QPoint p) {
-    endPoint.setX( p.x() );
-    endPoint.setY( p.y() );
-}
-
-void Logger::run() {
+void Logger::process() {
     samples.clear();
     socket->readAll(); // Flush
-    while (true) {
-        QMutex mutex;
-        mutex.lock();
-        if (this->stop) break;
-        mutex.unlock();
+    while (mStop == false) {
         QString line;
         do {
             while ( !socket->canReadLine() ) {
@@ -45,8 +32,20 @@ void Logger::run() {
             line = socket->readLine();
         } while( !line[0].isDigit() );
         qDebug() << line;
-        samples.append( new Sample(line) );
+        samples.append( Sample(line) );
     }
+}
+
+void Logger::start(QPoint start, QPoint end, int _floorPlan) {
+    startPoint = start;
+    endPoint   = end;
+    floorPlan = _floorPlan;
+    mStop = false;
+    process();
+}
+
+void Logger::stop() {
+    mStop = true;
 }
 
 void Logger::commit() {
@@ -57,14 +56,14 @@ void Logger::commit() {
     double xDistancePerSample = distancePerSample * cos(theta);
     double yDistancePerSample = distancePerSample * sin(theta);
     unsigned int n = 0;
-    for (QList<Sample *>::iterator it = samples.begin(); it != samples.end(); it++) {
+    for (QList<Sample>::iterator it = samples.begin(); it != samples.end(); it++) {
         double xd = startPoint.x() + (n * xDistancePerSample);
         double yd = startPoint.y() + (n * yDistancePerSample);
         int x = round(xd);
         int y = round(yd);
-        (*it)->setCoordinates(x, y);
-        (*it)->setFloorPlanID(floorPlanID);
-        db->addSample(**it);
+        it->setCoordinates(x, y);
+        it->setFloorPlanID(floorPlan);
+        db->addSample(*it);
         n++;
     }
 }

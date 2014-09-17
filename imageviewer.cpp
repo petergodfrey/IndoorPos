@@ -1,15 +1,20 @@
 #include "imageviewer.h"
 
+#include <QDebug>
+
 ImageViewer::ImageViewer(QObject *parent) : imageLabel(this), scaleFactor(1.0), startPointHasBeenSet(false), endPointHasBeenSet(false) {
     this->setWidget(&imageLabel);
 }
 
-void ImageViewer::open(QString filePath) {
+void ImageViewer::open(QString filePath, int width) {
     scaleFactor = 1.0;
     QImage image(filePath);
     pixmap = QPixmap::fromImage(image);
     pixmap = scaledPixmap();
     imageLabel.setPixmap(pixmap);
+    double aspectRatio = (double)pixmap.width() / pixmap.height();
+    gridSize.setWidth(width * 2);
+    gridSize.setHeight( (double)(width * 2) / aspectRatio); // Default resolution is 50cm
 }
 
 void ImageViewer::zoomIn() {
@@ -25,11 +30,13 @@ bool ImageViewer::pointsAreSet() {
 }
 
 QPoint ImageViewer::startPoint() {
-    return QPoint(start);
+    //return QPoint(start);
+    return gridStart;
 }
 
 QPoint ImageViewer::endPoint() {
-    return QPoint(end);
+    //return QPoint(end);
+    return gridEnd;
 }
 
 void ImageViewer::mousePressEvent(QMouseEvent *mouseEvent) {
@@ -42,14 +49,16 @@ void ImageViewer::mousePressEvent(QMouseEvent *mouseEvent) {
         pixmapStart.setY( p.y() );
         start.setX(p.x() / scaleFactor);
         start.setY(p.y() / scaleFactor);
+        gridStart = transposeToGrid(start);
         paintStartPoint(painter);
         startPointHasBeenSet = true;
         endPointHasBeenSet   = false;
     } else {
-        end.setX(p.x() / scaleFactor);
-        end.setY(p.y() / scaleFactor);
         pixmapEnd.setX( p.x() );
         pixmapEnd.setY( p.y() );
+        end.setX(p.x() / scaleFactor);
+        end.setY(p.y() / scaleFactor);
+        gridEnd = transposeToGrid(end);
         paintStartPoint(painter);
         paintEndPoint(painter);
         paintLine(painter);
@@ -80,6 +89,11 @@ void ImageViewer::paintLine(QPainter &painter) {
     pen.setColor(Qt::black);
     painter.setPen(pen);
     painter.drawLine(pixmapStart, pixmapEnd);
+}
+
+QPoint ImageViewer::transposeToGrid(QPoint p) {
+    return QPoint( p.x() / ( (double)pixmap.width()  / gridSize.width()  ),
+                   p.y() / ( (double)pixmap.height() / gridSize.height() ) );
 }
 
 void ImageViewer::scaleImage(double factor) {

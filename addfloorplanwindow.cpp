@@ -24,6 +24,10 @@ QString AddFloorPlanWindow::getFloorPlanLevel() {
     return floorPlanLevel;
 }
 
+int AddFloorPlanWindow::getWidth() {
+    return width;
+}
+
 void AddFloorPlanWindow::on_toolButton_clicked() {
     filePath = QFileDialog::getOpenFileName(this, "Select Floorplan Image", "/Users/Peter/", tr("Image Files (*.png *.jpg *.bmp)") );
     if ( !filePath.isNull() ) {
@@ -33,11 +37,14 @@ void AddFloorPlanWindow::on_toolButton_clicked() {
 }
 
 void AddFloorPlanWindow::on_okPushButton_clicked() {
-    if (ui->floorNameLineEdit->text().isEmpty() || filePathSet == false) {
+    if (ui->floorNameLineEdit->text().isEmpty() || ui->widthLineEdit->text().isEmpty() || filePathSet == false) {
         QMessageBox e;
         e.setWindowTitle("ERROR");
         if ( ui->floorNameLineEdit->text().isEmpty() ) {
             e.setText("Floor Name cannot be empty\n");
+        }
+        if ( ui->widthLineEdit->text().isEmpty() ) {
+            e.setText( e.text().append("Approx width cannot be empty\n") );
         }
         if (filePathSet == false) {
             e.setText( e.text().append("No file chosen") );
@@ -46,6 +53,7 @@ void AddFloorPlanWindow::on_okPushButton_clicked() {
     } else {
         floorPlanName  = ui->floorNameLineEdit->text();
         floorPlanLevel = ui->levelLineEdit->text();
+        width          = ui->widthLineEdit->text().toInt();
         accept();
     }
 }

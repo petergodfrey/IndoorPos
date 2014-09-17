@@ -9,9 +9,7 @@ DatabaseDriver::DatabaseDriver(QString address, int port, QString name, QObject 
     db.setHostName(address);
     db.setPort(port);
     db.setDatabaseName(name);
-    if ( !db.open() ) {
-        throw new DatabaseException();
-    }
+    db.open();
     mBuildingsModel             = new QSqlTableModel(this, db);
     mLoggingFloorPlansModel     = new QSqlTableModel(this, db);
     mPositioningFloorPlansModel = new QSqlTableModel(this, db);
@@ -19,6 +17,10 @@ DatabaseDriver::DatabaseDriver(QString address, int port, QString name, QObject 
 
 DatabaseDriver::~DatabaseDriver() {
     db.close();
+}
+
+bool DatabaseDriver::isConnected() {
+    return db.isOpen();
 }
 
 QSqlQueryModel* DatabaseDriver::buildingsModel() {
@@ -77,6 +79,19 @@ QString DatabaseDriver::floorPlanImagePath(int floorPlan) {
     return q.value(0).toString();
 }
 
+int DatabaseDriver::floorPlanWidth(int floorPlan) {
+    QSqlQuery q;
+    QString   t;
+    t = QString(
+        "SELECT width "
+        "FROM   Floorplans "
+        "WHERE  id = %1;"
+        ).arg(floorPlan);
+    q.exec(t);
+    q.next();
+    return q.value(0).toInt();
+}
+
 void DatabaseDriver::addSample(Sample s) {
     QSqlQuery q;
     QString   t;
@@ -122,17 +137,17 @@ void DatabaseDriver::addBuilding(QString name, QString address) {
     mBuildingsModel->setQuery(BUILDINGS_MODEL_QUERY);
 }
 
-void DatabaseDriver::addFloorplan(int building, QString name, QString level, QString map) {
+void DatabaseDriver::addFloorplan(int building, QString name, QString level, QString map, int width) {
     QSqlQuery q;
     QString   t;
     t = QString(
-        "INSERT INTO FloorPlans (building, name, level, map) "
-        "VALUES (%1, '%2', '%3', '%4');"
-        ).arg(building).arg(name).arg(level).arg(map);
+        "INSERT INTO FloorPlans (building, name, level, map, width) "
+        "VALUES (%1, '%2', '%3', '%4', %5);"
+        ).arg(building).arg(name).arg(level).arg(map).arg(width);
     if ( q.exec(t) ) {
         qDebug() << "addFloorplan Success";
     } else {
-        qDebug() << "ERROR: DatabaseDriver::addFloorplan " << db.lastError().text();
+        qDebug() << "ERROR: DatabaseDriver::addFloorplan " << t;//db.lastError().text();
     }
     mLoggingFloorPlansModel->setQuery(FLOORPLANS_MODEL_QUERY);
 }
@@ -180,4 +195,27 @@ QPoint DatabaseDriver::closestPoint(Sample sample, int floorPlan) {
         }
     }
     return QPoint(x, y);
+}
+
+// Choose the M closest locations and return the average (centroid location)
+QPoint DatabaseDriver::locate(Sample sample) {
+    QSqlQuery q;
+    QString   t;
+    t = QString(
+        "SELECT   x, y, ABS(%1 - verticalIntensity) + ABS(%2 - horizontalIntensity) AS difference"
+        "FROM     Samples "
+        "WHERE    floorplan = %3 "
+        "ORDER BY difference;"
+        ).arg(sample.verticalIntensity
+        ).arg(sample.horizontalIntensity
+        ).arg(sample.floorPlanID);
+    q.exec(t);
+    int xSum = 0;
+    int ySum = 0;
+    int n;
+    for (n = 0; n < 3 && q.next(); n++) {
+         xSum += q.value(0).toInt();
+         ySum += q.value(1).toInt();
+    }
+    return QPoint(xSum / n, ySum / n);
 }

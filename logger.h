@@ -1,38 +1,33 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <QThread>
 #include <QTcpSocket>
 #include "databasedriver.h"
 
-class Logger : public QThread {
+class Logger : public QObject {
 
     Q_OBJECT
 
 public:
-    explicit Logger(QTcpSocket *s, DatabaseDriver *_db, QObject *parent = 0);
+    Logger(QTcpSocket *socket, DatabaseDriver *db);
     ~Logger();
-    void run();
-    void commit();
-    void setFloorPlanID(int floorPlanID);
-    void setStartPoint(QPoint p);
-    void setEndPoint(QPoint p);
-    bool stop;
+    bool isRunning();
 
 private:
     QTcpSocket     *socket;
     DatabaseDriver *db;
-    int             floorPlanID;
-    QString         databaseName;
-    QString         databaseServerName;
-    int             databasePort;
+    int             floorPlan;
     QPoint          startPoint;
     QPoint          endPoint;
-    QList<Sample *> samples;
+    QList<Sample>   samples;
+    bool            mStop;
 
-signals:
+    void process();
 
 public slots:
+    void start(QPoint start, QPoint end, int floorPlan);
+    void stop();
+    void commit();
 
 };
 
