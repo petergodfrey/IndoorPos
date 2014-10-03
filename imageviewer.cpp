@@ -3,7 +3,11 @@
 #include <QDebug>
 #include <cmath>
 
-ImageViewer::ImageViewer(QObject *parent) : imageLabel(this), scaleFactor(1.0), startPointHasBeenSet(false), endPointHasBeenSet(false) {
+ImageViewer::ImageViewer(QObject *parent) :
+    imageLabel           (this),
+    scaleFactor          (1.0),
+    startPointHasBeenSet (false),
+    endPointHasBeenSet   (false) {
     this->setWidget(&imageLabel);
 }
 
@@ -40,50 +44,49 @@ QPoint ImageViewer::endPoint() {
 
 void ImageViewer::mousePressEvent(QMouseEvent *mouseEvent) {
     if ( pixmap.isNull() ) return;
-    QPoint p  = imageLabel.mapFrom( this, mouseEvent->pos() ); // Map point from QScrollArea to QImageLabel
-    QPixmap scaled = scaledPixmap();                           // Get the scaled pixmap
+    QPoint p = imageLabel.mapFrom( this, mouseEvent->pos() ); // Map point from QScrollArea to QImageLabel
+    QPixmap scaled = scaledPixmap();                          // Get the scaled pixmap
     QPainter painter(&scaled);
     if (!startPointHasBeenSet || endPointHasBeenSet) {
-        painterStart.setX( p.x() );                            // Set start point for painting
-        painterStart.setY( p.y() );
-        paintStartPoint(painter);                              // Paint start point on scaled pixmap
-        gridStart = transposeToGrid( QPoint( p.x(), p.y() ) );
+        painterStart = p;               // Set start point for painting
+        paintStartPoint(painter);       // Paint start point on scaled pixmap
+        gridStart = transposeToGrid(p);
         startPointHasBeenSet = true;
         endPointHasBeenSet   = false;
         qDebug() << gridStart;
     } else {
-        painterEnd.setX( p.x() );                     // Set end point for painting
-        painterEnd.setY( p.y() );
-        paintStartPoint(painter);                     // Paint start point on scaled pixmap
-        paintEndPoint(painter);                       // Paint end point on scaled pixmap
-        paintLine(painter);                           // Paint line on scaled pixmap
-        gridEnd = transposeToGrid( QPoint( p.x(), p.y() ) );
+        painterEnd = p;                 // Set end point for painting
+        paintLine(painter);             // Paint line on scaled pixmap
+        paintStartPoint(painter);       // Paint start point on scaled pixmap
+        paintEndPoint(painter);         // Paint end point on scaled pixmap
+        gridEnd = transposeToGrid(p);
         endPointHasBeenSet = true;
         qDebug() << gridEnd;
     }
     imageLabel.setPixmap(scaled);
-
 }
 
 void ImageViewer::paintStartPoint(QPainter &painter) {
     QPen pen;
-    pen.setWidth(6);
+    pen.setWidth(8);
     pen.setColor(Qt::red);
+    pen.setCapStyle(Qt::RoundCap);
     painter.setPen(pen);
     painter.drawPoint(painterStart);
 }
 
 void ImageViewer::paintEndPoint(QPainter &painter) {
     QPen pen;
-    pen.setWidth(6);
+    pen.setWidth(8);
     pen.setColor(Qt::blue);
+    pen.setCapStyle(Qt::RoundCap);
     painter.setPen(pen);
     painter.drawPoint(painterEnd);
 }
 
 void ImageViewer::paintLine(QPainter &painter) {
     QPen pen;
-    pen.setWidth(2);
+    pen.setWidth(3);
     pen.setColor(Qt::black);
     painter.setPen(pen);
     painter.drawLine(painterStart, painterEnd);
