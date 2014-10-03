@@ -125,8 +125,8 @@ void MainWindow::on_newFloorPlanPushButton_clicked() {
                  ).arg( time(0)
                  ).arg(extension) );
         if (QFile::copy(oldFilePath, newFilePath) == false) {
-            //qDebug() << oldFilePath;
-            //qDebug() << newFilePath;
+            qDebug() << oldFilePath;
+            qDebug() << newFilePath;
             qDebug() << "File copy failed";
         }
         db->addFloorplan( db->buildingID( ui->loggingBuildingComboBox->currentIndex() ),
@@ -142,7 +142,13 @@ void MainWindow::on_buildingDeletePushButton_clicked() {
 }
 
 void MainWindow::on_floorPlanDeletePushButton_clicked() {
-    db->deleteFloorPlan( db->loggingFloorPlanID( ui->loggingFloorPlanComboBox->currentIndex() ) );
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question( this,
+                                   tr("Are you sure?"),
+                                   tr("Are you sure you want to delete the selected floorplan and all it's data?") );
+    if (reply == QMessageBox::Yes) {
+        db->deleteFloorPlan( db->loggingFloorPlanID( ui->loggingFloorPlanComboBox->currentIndex() ) );
+    }
 }
 
 void MainWindow::on_loggingStartButton_clicked() {
@@ -159,7 +165,8 @@ void MainWindow::on_loggingStartButton_clicked() {
 
 void MainWindow::on_loggingStopButton_clicked() {
     if ( l->isRunning() ) {
-        emit stopLogging();
+        l->stop();
+        //emit stopLogging();
         ui->dataLoggingLabel->setText("");
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question( this,
@@ -211,6 +218,7 @@ void MainWindow::on_positioningStopButton_clicked() {
 }
 
 void MainWindow::positioningLocationChanged(const QPoint &location) {
+    qDebug() << location;
     positioningImageViewer->paintLocation(location);
 }
 

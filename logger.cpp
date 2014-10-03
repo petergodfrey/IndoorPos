@@ -8,12 +8,11 @@ Logger::Logger(QTcpSocket *_socket, DatabaseDriver *_db) :
     floorPlan    (-1),
     startPoint   (0, 0),
     endPoint     (0, 0),
-    samples      (),
     mStop        (true) {
 }
 
 Logger::~Logger() {
-    //delete socket;
+
 }
 
 bool Logger::isRunning() {
@@ -26,9 +25,9 @@ void Logger::process() {
     while (mStop == false) {
         QString line;
         do {
-            while ( !socket->canReadLine() ) {
+            do {
                 socket->waitForReadyRead(100);
-            }
+            } while ( !socket->canReadLine() );
             line = socket->readLine();
         } while( !line[0].isDigit() );
         qDebug() << line;
@@ -61,6 +60,7 @@ void Logger::commit() {
         double yd = startPoint.y() + (n * yDistancePerSample);
         int x = round(xd);
         int y = round(yd);
+        qDebug() << "(" << x << "," << y << ")";
         it->setCoordinates(x, y);
         it->setFloorPlanID(floorPlan);
         db->addSample(*it);

@@ -22,13 +22,13 @@ private:
     QList<Sample>   samples;
     bool            mStop;
 
-    void process();
-
 public slots:
     void start(QPoint start, QPoint end, int floorPlan);
     void stop();
     void commit();
 
+private slots:
+    void process();
 };
 
 #endif // LOGGER_H

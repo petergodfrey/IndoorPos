@@ -3,15 +3,13 @@
 Matcher::Matcher(QTcpSocket *_socket, DatabaseDriver *_db) :
     socket       (_socket),
     db           (_db),
-    floorPlan    (-1),
-    timer        (),
-    samples      () {
+    floorPlan    (-1) {
     connect(&timer, SIGNAL( timeout() ), this, SLOT( process() ) );
 }
 
 void Matcher::start(int _floorPlan) {
     floorPlan = _floorPlan;
-    timer.start(1000);
+    timer.start(2000);
 }
 
 void Matcher::stop() {
@@ -19,16 +17,27 @@ void Matcher::stop() {
 }
 
 void Matcher::process() {
+    qDebug() << "Matcher::process()";
+
     socket->readAll(); // Flush
     samples.clear();   // Flush
     QString line;
-    do {
-        while ( !socket->canReadLine() ) {
-            socket->waitForReadyRead(100);
-        }
-        line = socket->readLine();
-    } while( !line[0].isDigit() );
-    Sample s(line);
-    s.setFloorPlanID(floorPlan);
-    emit locationChanged( db->locate(s) );
+    double v = 0;
+    double h = 0;
+    for (int i = 0; i < 10; i++) {
+        do {
+            do {
+                socket->waitForReadyRead(100);
+            } while ( !socket->canReadLine() );
+            line = socket->readLine();
+        } while( !line[0].isDigit() );
+        Sample s(line);
+        v += s.verticalIntensity;
+        h += s.horizontalIntensity;
+    }
+    v = v / 10;
+    h = h / 10;
+    Sample t(h, v);
+    t.setFloorPlanID(floorPlan);
+    emit locationChanged( db->locateClosestM(t) );
 }

@@ -172,50 +172,44 @@ void DatabaseDriver::deleteFloorPlan(int floorPlan) {
 
 
 
-QPoint DatabaseDriver::closestPoint(Sample sample, int floorPlan) {
-    QSqlQuery q;
-    QString   t;
-    t = QString(
-        "SELECT x, y, verticalIntensity, horizontalIntensity "
-        "FROM   Samples "
-        "WHERE  floorplan = %1;"
-        ).arg(floorPlan);
-    q.exec(t);
-
-    int x = 0;
-    int y = 0;
-    double minDifference = 99999999;
-    while ( q.next() ) {
-        double horizontalDifference = fabs( sample.horizontalIntensity - q.value(3).toDouble() );
-        double verticalDifference   = fabs( sample.verticalIntensity   - q.value(2).toDouble() );
-        if ( (horizontalDifference + verticalDifference) < minDifference) {
-            minDifference = horizontalDifference + verticalDifference;
-            x = q.value(0).toInt();
-            y = q.value(1).toInt();
-        }
-    }
-    return QPoint(x, y);
-}
-
 // Choose the M closest locations and return the average (centroid location)
-QPoint DatabaseDriver::locate(Sample sample) {
+QPoint DatabaseDriver::locateClosestM(Sample sample) {
+    int m = 3; // The number of closest locations to consider
     QSqlQuery q;
     QString   t;
     t = QString(
-        "SELECT   x, y, ABS(%1 - verticalIntensity) + ABS(%2 - horizontalIntensity) AS difference"
+        "SELECT   x, y, ABS(%1 - verticalIntensity) + ABS(%2 - horizontalIntensity) AS difference "
         "FROM     Samples "
         "WHERE    floorplan = %3 "
-        "ORDER BY difference;"
+        "ORDER BY difference "
+        "LIMIT    %4;"
         ).arg(sample.verticalIntensity
         ).arg(sample.horizontalIntensity
-        ).arg(sample.floorPlanID);
+        ).arg(sample.floorPlanID
+        ).arg(m);
     q.exec(t);
     int xSum = 0;
     int ySum = 0;
     int n;
-    for (n = 0; n < 3 && q.next(); n++) {
+    for (n = 0; n < m && q.next(); n++) {
          xSum += q.value(0).toInt();
          ySum += q.value(1).toInt();
     }
     return QPoint(xSum / n, ySum / n);
+}
+
+QVector<QPoint> DatabaseDriver::getPoints(int floorPlan) {
+    QSqlQuery q;
+    QString   t;
+    t = QString(
+        "SELECT   x, y "
+        "FROM     Samples "
+        "WHERE    floorplan = %1 "
+        ).arg(floorPlan);
+    q.exec(t);
+    QVector<QPoint> v;
+    while( q.next() ) {
+        v.append( QPoint( q.value(0).toInt(), q.value(1).toInt() ) );
+    }
+    return v;
 }

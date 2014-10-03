@@ -29,8 +29,8 @@ public:
     void            addFloorplan(int building, QString name, QString level, QString map, int width);
     void            deleteFloorPlan(int floorPlan);
 
-    QPoint          locate(Sample sample);
-    QPoint          closestPoint(Sample sample, int floorPlan);
+    QPoint          locateClosestM(Sample sample);
+    QVector<QPoint> getPoints(int floorPlan);
 
 private:
     QSqlDatabase    db;
