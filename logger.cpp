@@ -57,7 +57,13 @@ void Logger::commit() {
     unsigned int n = 0;
     for (QList<Sample>::iterator it = samples.begin(); it != samples.end(); it++) {
         double xd = startPoint.x() + (n * xDistancePerSample);
+        if ( startPoint.x() > endPoint.x() ) {
+            xd = startPoint.x() - (n * xDistancePerSample);
+        }
         double yd = startPoint.y() + (n * yDistancePerSample);
+        if ( startPoint.y() > endPoint.y() ) {
+            yd = startPoint.y() - (n * yDistancePerSample);
+        }
         int x = round(xd);
         int y = round(yd);
         qDebug() << "(" << x << "," << y << ")";

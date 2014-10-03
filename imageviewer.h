@@ -8,15 +8,15 @@ class ImageViewer : public QScrollArea {
     Q_OBJECT
 
 public:
-            ImageViewer(QObject *parent = 0);
-    void    open(QString filePath, int width);
-    void    zoomIn();
-    void    zoomOut();
-    bool    pointsAreSet();
-    QPoint  startPoint();
-    QPoint  endPoint();
-    void    paintLocation(QPoint point);
-    void    paintLineLogged();
+           ImageViewer(QObject *parent = 0);
+    void   open(QString filePath, int width);
+    void   zoomIn();
+    void   zoomOut();
+    bool   pointsAreSet();
+    QPoint startPoint();
+    QPoint endPoint();
+    void   paintLocation(QPoint point);
+    void   paintLineLogged();
 
 
 protected:

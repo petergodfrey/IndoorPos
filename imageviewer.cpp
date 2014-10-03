@@ -1,6 +1,7 @@
 #include "imageviewer.h"
 
 #include <QDebug>
+#include <cmath>
 
 ImageViewer::ImageViewer(QObject *parent) : imageLabel(this), scaleFactor(1.0), startPointHasBeenSet(false), endPointHasBeenSet(false) {
     this->setWidget(&imageLabel);
@@ -12,9 +13,9 @@ void ImageViewer::open(QString filePath, int width) {
     scaleFactor = 1.0;
     pixmap = scaledPixmap();
     imageLabel.setPixmap(pixmap);
-    double aspectRatio = (double)pixmap.width() / (double)pixmap.height();
+    double aspectRatio = (double)pixmap.width() / (double)pixmap.height() ;
     gridSize.setWidth(width * 2);
-    gridSize.setHeight( (double)(width * 2) / aspectRatio); // Default resolution is 50cm
+    gridSize.setHeight( round( (double)(width * 2) / aspectRatio) ); // Default resolution is 50cm
 }
 
 void ImageViewer::zoomIn() {
@@ -30,12 +31,10 @@ bool ImageViewer::pointsAreSet() {
 }
 
 QPoint ImageViewer::startPoint() {
-    //return QPoint(start);
     return gridStart;
 }
 
 QPoint ImageViewer::endPoint() {
-    //return QPoint(end);
     return gridEnd;
 }
 
@@ -48,9 +47,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *mouseEvent) {
         painterStart.setX( p.x() );                            // Set start point for painting
         painterStart.setY( p.y() );
         paintStartPoint(painter);                              // Paint start point on scaled pixmap
-        gridStart = transposeToGrid(
-                        QPoint( p.x() / scaleFactor,
-                                p.y() / scaleFactor) );
+        gridStart = transposeToGrid( QPoint( p.x(), p.y() ) );
         startPointHasBeenSet = true;
         endPointHasBeenSet   = false;
         qDebug() << gridStart;
@@ -60,9 +57,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *mouseEvent) {
         paintStartPoint(painter);                     // Paint start point on scaled pixmap
         paintEndPoint(painter);                       // Paint end point on scaled pixmap
         paintLine(painter);                           // Paint line on scaled pixmap
-        gridEnd = transposeToGrid(
-                      QPoint( p.x() / scaleFactor,
-                              p.y() / scaleFactor) );
+        gridEnd = transposeToGrid( QPoint( p.x(), p.y() ) );
         endPointHasBeenSet = true;
         qDebug() << gridEnd;
     }
@@ -95,13 +90,13 @@ void ImageViewer::paintLine(QPainter &painter) {
 }
 
 QPoint ImageViewer::transposeToGrid(QPoint p) {
-    return QPoint( p.x() / ( (double)pixmap.width()  / gridSize.width()  ),
-                   p.y() / ( (double)pixmap.height() / gridSize.height() ) );
+    return QPoint( round( (double)p.x() / scaleFactor / ( (double)pixmap.width()  / gridSize.width()  ) ),
+                   round( (double)p.y() / scaleFactor / ( (double)pixmap.height() / gridSize.height() ) ) );
 }
 
 QPoint ImageViewer::transposeToPixmap(QPoint p) {
-    return QPoint( p.x() * scaleFactor * ( (double)pixmap.width()  / gridSize.width()  ),
-                   p.y() * scaleFactor *( (double)pixmap.height() / gridSize.height() ) );
+    return QPoint( round( (double)p.x() * scaleFactor * ( (double)pixmap.width()  / gridSize.width()  ) ),
+                   round( (double)p.y() * scaleFactor * ( (double)pixmap.height() / gridSize.height() ) ) );
 }
 
 void ImageViewer::scaleImage(double factor) {
@@ -131,11 +126,14 @@ void ImageViewer::paintLineLogged() {
     pen.setWidth(8);
     pen.setColor( QColor(0, 255, 0, 127) );
     painter.setPen(pen);
-    painter.drawLine(painterStart / scaleFactor, painterEnd / scaleFactor);
+    painter.drawLine( QPoint( round( (double)painterStart.x() / scaleFactor ),
+                              round( (double)painterStart.y() / scaleFactor ) ),
+                      QPoint( round( (double)painterEnd.x() / scaleFactor ),
+                              round( (double)painterEnd.y() / scaleFactor ) ) );
     imageLabel.setPixmap( scaledPixmap() );
 }
 
 QPixmap ImageViewer::scaledPixmap() {
-    return pixmap.scaled(pixmap.height() * scaleFactor, pixmap.width() * scaleFactor,
+    return pixmap.scaled( round( (double)pixmap.height() * scaleFactor ), round( (double)pixmap.width() * scaleFactor ),
                          Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 }

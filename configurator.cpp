@@ -8,7 +8,7 @@ Configurator::Configurator() :
     mHostPort        (51600),
     mDatabaseAddress ("localhost"),
     mDatabasePort    (5432),
-    mDatabaseName    ("indoor") {
+    mDatabaseName    ("test") {
 
     /*
     QFile file( QDir::currentPath().append("/geo.conf") );
